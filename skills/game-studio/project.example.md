@@ -1,6 +1,11 @@
 # project.md (template): fill in, delete what does not apply
 
-Save as `project.md` beside `SKILL.md`. The skill's `<placeholders>` resolve to the values here.
+Save as `<project>/.claude/game-studio/project.md` (plugin install) or as `project.md` beside
+`SKILL.md` (skill copied into the project). The skill's `<placeholders>` resolve to the values here.
+
+Plugin options (`/config`, section game-studio) mirror four of these values for the hooks and
+agents: `queue_doc`, `evidence_dir`, `engine_process` (process-name substring counted by the
+engine-cap warning) and `max_engine_runs` (the total cap). Keep them equal to the values below.
 
 ## Project
 
@@ -35,6 +40,8 @@ Save as `project.md` beside `SKILL.md`. The skill's `<placeholders>` resolve to 
 | <e.g. art app> | <N, e.g. 4 parallel instances> | <ports/profiles> | <commands> | <save check first> |
 
 Shared single-owner sources: <files>
+
+Art-tool MCP server name (for the `art-owner` agent's tools; default `blender`): <name>
 
 ## Knowledge base (optional)
 

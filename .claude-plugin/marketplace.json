@@ -1,0 +1,17 @@
+{
+  "name": "game-studio",
+  "description": "The game-studio plugin: a coordinator-and-workers process for building games with Claude Code.",
+  "owner": {
+    "name": "propanoid-jpg",
+    "url": "https://github.com/propanoid-jpg"
+  },
+  "plugins": [
+    {
+      "name": "game-studio",
+      "source": "./",
+      "description": "Studio roles as agents, brief/review/pause/resume commands and safety hooks for game projects.",
+      "category": "development",
+      "tags": ["gamedev", "agents", "workflow"]
+    }
+  ]
+}

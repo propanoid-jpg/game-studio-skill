@@ -1,0 +1,42 @@
+{
+  "name": "game-studio",
+  "displayName": "Game Studio",
+  "version": "1.0.0",
+  "description": "Run a game project as a small studio: a coordinator session plus fresh role agents (feature, UI, art owner, prep, integration, QA, balance, visual review, knowledge keeper, release), with briefs, handoffs, review, pause/resume and safety hooks. Engine- and art-pipeline-agnostic.",
+  "author": {
+    "name": "propanoid-jpg",
+    "url": "https://github.com/propanoid-jpg"
+  },
+  "homepage": "https://github.com/propanoid-jpg/game-studio-skill",
+  "repository": "https://github.com/propanoid-jpg/game-studio-skill",
+  "license": "MIT",
+  "keywords": ["gamedev", "game-studio", "agents", "workflow", "qa", "godot", "unity", "unreal", "blender"],
+  "userConfig": {
+    "engine_process": {
+      "type": "string",
+      "title": "Engine process name",
+      "description": "Substring of the engine/editor process name to count (case-insensitive), e.g. godot, Unity, UnrealEditor. Empty disables the engine-run warning.",
+      "default": "godot"
+    },
+    "max_engine_runs": {
+      "type": "number",
+      "title": "Max concurrent engine runs",
+      "description": "Total engine processes allowed across all workers; the hook warns (never blocks) at this count.",
+      "default": 10,
+      "min": 0,
+      "max": 200
+    },
+    "evidence_dir": {
+      "type": "string",
+      "title": "Evidence folder",
+      "description": "Project-relative folder for worker evidence and handoffs: <evidence_dir>/<stream>/<task>/.",
+      "default": "evidence"
+    },
+    "queue_doc": {
+      "type": "string",
+      "title": "Task queue document",
+      "description": "Project-relative path of the single task queue the coordinator maintains.",
+      "default": "docs/TODO.md"
+    }
+  }
+}

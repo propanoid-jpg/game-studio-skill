@@ -11,9 +11,26 @@ argument-hint: plan | brief <role> <task> | review <handoff> | qa | pause | resu
 # game-studio: how the game gets built
 
 One main session (the **coordinator**) plus many fresh **workers** form a small studio. The process
-is engine-agnostic. Project specifics (engine, paths, commands, caps, opt-in policies) live in
-`project.md` next to this file (start from `project.example.md`). The project's instruction file and
-the user's latest explicit corrections win over this skill on any conflict.
+is engine-agnostic. Project specifics (engine, paths, commands, caps, opt-in policies) live in the
+project's `project.md`: `.claude/game-studio/project.md` when this skill comes from the plugin, or
+next to this file when the skill is copied into a project (start from `project.example.md`). The
+project's instruction file and the user's latest explicit corrections win over this skill on any
+conflict.
+
+**Plugin install.** When this skill is installed as the `game-studio` plugin:
+
+- Launch workers as the role agents `game-studio:<role>` (`feature-dev`, `ui-dev`, `art-owner`,
+  `prep`, `integration`, `qa`, `balance`, `visual-review`, `knowledge-keeper`, `release-manager`,
+  `surveyor`, `coordinator-helper`) instead of a general-purpose agent. Each preloads this skill,
+  carries the hard worker rules and has no Agent tool. A `model` passed at launch overrides its default.
+- Coordinator commands: `/game-studio:studio-brief`, `/game-studio:studio-review`,
+  `/game-studio:studio-pause`, `/game-studio:studio-resume`.
+- Plugin options (`/config`): `queue_doc` (default `docs/TODO.md`), `evidence_dir` (default
+  `evidence`), `engine_process` (default `godot`) and `max_engine_runs` (default 10), read by the
+  hooks. `project.md` is the source of truth; keep the options equal to it.
+- Advisory hooks: a warning before shell commands when the engine-process count reaches the cap, a
+  review-and-clean-up reminder after each worker launch, and a session-start pointer to
+  `project.md` and the queue doc. None of them block.
 
 | File | Read when |
 |---|---|
@@ -49,6 +66,10 @@ Full definitions in `references/roles.md`.
 | Visual polish/review worker | Live-play readability against locked criteria | parallel | strongest |
 | Knowledge keeper | Knowledge-base sync and lint (if configured) | parallel | cheapest |
 | Release manager | Packages a release, ONLY on explicit user approval | one | mid |
+| Surveyor | Read-only inventories, grep audits, log summaries | parallel | cheapest |
+| Coordinator helper (optional) | Drafts briefs, pre-reviews handoffs; never decides | parallel | strongest |
+
+UI work is a feature worker specialised on the sketch-first visual workflow (`ui-dev` agent).
 
 ### Model choice
 

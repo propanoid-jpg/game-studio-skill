@@ -6,6 +6,27 @@ the user or launches workers. Paths and tools come from `project.md`.
 
 Evidence folder convention: `<evidence_dir>/<stream>/<task>/`.
 
+With the `game-studio` plugin installed, each worker role has an agent type (launch with
+`subagent_type: "game-studio:<agent>"`):
+
+| Role | Agent | Default model |
+|---|---|---|
+| Feature/system worker | `feature-dev` | sonnet (opus for unknown-cause debugging) |
+| Feature worker on UI | `ui-dev` | sonnet |
+| Art owner (one per slot) | `art-owner` | opus |
+| Prep worker | `prep` | sonnet |
+| Integration/validation worker | `integration` | sonnet |
+| QA/test-health worker | `qa` | sonnet |
+| Balance worker | `balance` | opus |
+| Visual polish/review worker | `visual-review` | opus |
+| Knowledge keeper | `knowledge-keeper` | haiku |
+| Release manager | `release-manager` | sonnet |
+| Surveyor (mechanical read-only work) | `surveyor` | haiku |
+| Coordinator helper (optional) | `coordinator-helper` | opus |
+
+The art owner's tools include `mcp__blender__*`; a project using another art-tool MCP server copies
+`agents/art-owner.md` into its `.claude/agents/` under a new name and edits the `tools` line.
+
 ---
 
 ## Coordinator (the main session)
