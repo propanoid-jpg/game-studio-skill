@@ -14,7 +14,8 @@ Coordinator (or `game-studio:coordinator-helper`). Follows section 15 of the `ga
    `surveyor` or `coordinator-helper` (definitions in
    `${CLAUDE_PLUGIN_ROOT}/skills/game-studio/references/roles.md`). Keep the agent's default model
    unless the task needs another tier; pass `model` on launch to override.
-2. Copy `${CLAUDE_PLUGIN_ROOT}/skills/game-studio/templates/worker-brief.md` and fill every `<...>`
+2. Fill `${CLAUDE_PLUGIN_ROOT}/skills/game-studio/templates/worker-brief.md` in as the Agent prompt
+   (the coordinator does not save briefs to disk; a worker writes any brief file) and fill every `<...>`
    from `project.md`, the queue doc (from project.md; plugin option `queue_doc`), prior handoffs and recorded
    before-data. The worker sees none of your conversation: paths, decisions and limits go in the brief.
 3. Name owned and shared files so parallel workers never overlap; name the exclusive-tool slot for an

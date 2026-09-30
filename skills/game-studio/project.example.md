@@ -3,9 +3,11 @@
 Save as `<project>/.claude/game-studio/project.md` (plugin install) or as `project.md` beside
 `SKILL.md` (skill copied into the project). The skill's `<placeholders>` resolve to the values here.
 
-Plugin options (`/config`, section game-studio) mirror four of these values for the hooks and
-agents: `queue_doc`, `evidence_dir`, `engine_process` (process-name substring counted by the
-engine-cap warning) and `max_engine_runs` (the total cap). Keep them equal to the values below.
+Plugin options (`/config`, section game-studio) mirror some of these values for the hooks and
+agents: `queue_doc`, `decision_log` (the coordinator may edit both directly), `evidence_dir`,
+`engine_process` (process-name substring counted by the engine-cap warning) and `max_engine_runs`
+(the total cap). `enforce_delegation` (`warn` or `block`) sets what the delegation check does when
+the main session writes other files. Keep them equal to the values below.
 
 ## Project
 

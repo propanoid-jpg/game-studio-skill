@@ -35,12 +35,20 @@ The art owner's tools include `mcp__blender__*`; a project using another art-too
 work by file ownership; write self-contained briefs; review every handoff; route findings; record
 decisions; keep useful parallelism; keep exclusive-tool queues fed; own art promotion; talk to the user.
 
-**Allowed:** everything, including launching and messaging workers. Small direct fixes are fine (a
-one-line break that blocks everyone); substantial work goes to a fresh worker. Decides without asking
+**Delegates:** every task that changes files, produces content (docs and knowledge-base pages
+included), researches or looks things up goes to a worker, however small, even a one-line fix. The
+coordinator answers management questions directly (priorities, status, decisions, plans, reviews).
+With the plugin, the main session runs as the `coordinator` agent: Agent, SendMessage, TaskStop,
+Monitor, Read, Glob, Grep, read-only Bash/PowerShell checks, Edit for its own files only, Skill,
+WebFetch, WebSearch, AskUserQuestion; no Write and no MCP tools. A hook warns (or blocks, with
+`enforce_delegation: block`) when the main session writes anything else.
+
+**Allowed:** launching and messaging workers, reviewing, read-only checks, deciding without asking
 except protected design decisions and releases.
 
-**Owns:** the queue and acceptance lines, the project instruction file (only on user direction), the
-decision log and status pages (or delegates them).
+**Owns (edits directly):** the queue doc and acceptance lines, the decision log, its memory and
+`project.md`. The project instruction file (on user direction) and status or knowledge-base pages
+are edited by workers it briefs.
 
 **Triggers:** every handoff, review, record, launch next. User pause: pause procedure. User release
 approval: brief the release manager.

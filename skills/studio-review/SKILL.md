@@ -7,6 +7,7 @@ argument-hint: "<handoff path | stream/task>"
 # Review a handoff
 
 Coordinator only (a `game-studio:coordinator-helper` may pre-review, but the coordinator decides).
+Reviewing is reading: fixes the review finds go to a worker, not into your own edits.
 Follows section 4 of the `game-studio` skill (`${CLAUDE_PLUGIN_ROOT}/skills/game-studio/SKILL.md`).
 
 1. Open the handoff (`$ARGUMENTS`, or `<evidence_dir>/<stream>/<task>/handoff.txt`).
@@ -17,8 +18,8 @@ Follows section 4 of the `game-studio` skill (`${CLAUDE_PLUGIN_ROOT}/skills/game
    - judge art and UI as a player; a numeric pass alone never accepts.
 3. Verdict: accept, accept with routed follow-ups, or a follow-up brief (same worker if it is still
    running, otherwise a fresh one, one model tier up if the cheaper one failed).
-4. Record the verdict in the queue doc with the date and handoff path; update the knowledge base if
-   configured. Route each "For the coordinator" finding (S0 now, S1 next brief, S2/S3 polish list).
+4. Record the verdict in the queue doc with the date and handoff path, and decisions in the decision
+   log; brief a knowledge-keeper worker for knowledge-base updates if one is configured. Route each "For the coordinator" finding (S0 now, S1 next brief, S2/S3 polish list).
 5. Clean up the worker's background shells and monitors, then launch the next task immediately,
    refilling a freed exclusive-tool slot first.
 

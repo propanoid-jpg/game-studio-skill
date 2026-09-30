@@ -25,7 +25,7 @@ Coordinator only. Follows section 12 of the `game-studio` skill
 
 4. Stop the background shells and monitors you started. Close only tools you launched, and only
    after checking there is no unsaved work. Never kill processes you did not start.
-5. Update the knowledge base's status page if one is configured.
+5. If a knowledge base is configured, brief a knowledge-keeper worker to update its status page.
 6. Report to the user: what was paused, the checkpoints, anything left running and why.
 
 Resume later with `/game-studio:studio-resume`.

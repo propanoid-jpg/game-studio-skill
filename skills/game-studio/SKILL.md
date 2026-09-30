@@ -19,18 +19,25 @@ conflict.
 
 **Plugin install.** When this skill is installed as the `game-studio` plugin:
 
+- The main session runs as the `game-studio:coordinator` agent (plugin setting `agent`): it can
+  launch and message workers, read, run read-only shell checks and edit only the queue doc, the
+  decision log, its memory and `project.md`. It has no Write or MCP tools. Opt out with your own
+  `agent` setting (see the plugin README).
 - Launch workers as the role agents `game-studio:<role>` (`feature-dev`, `ui-dev`, `art-owner`,
   `prep`, `integration`, `qa`, `balance`, `visual-review`, `knowledge-keeper`, `release-manager`,
   `surveyor`, `coordinator-helper`) instead of a general-purpose agent. Each preloads this skill,
   carries the hard worker rules and has no Agent tool. A `model` passed at launch overrides its default.
 - Coordinator commands: `/game-studio:studio-brief`, `/game-studio:studio-review`,
   `/game-studio:studio-pause`, `/game-studio:studio-resume`.
-- Plugin options (`/config`): `queue_doc` (default `docs/TODO.md`), `evidence_dir` (default
-  `evidence`), `engine_process` (default `godot`) and `max_engine_runs` (default 10), read by the
-  hooks. `project.md` is the source of truth; keep the options equal to it.
-- Advisory hooks: a warning before shell commands when the engine-process count reaches the cap, a
-  review-and-clean-up reminder after each worker launch, and a session-start pointer to
-  `project.md` and the queue doc. None of them block.
+- Plugin options (`/config`): `queue_doc` (default `docs/TODO.md`), `decision_log` (default
+  empty), `evidence_dir` (default `evidence`), `engine_process` (default `godot`),
+  `max_engine_runs` (default 10) and `enforce_delegation` (`warn` or `block`, default `warn`), read
+  by the hooks. `project.md` is the source of truth; keep the options equal to it.
+- Hooks: a warning before shell commands when the engine-process count reaches the cap, a
+  review-and-clean-up reminder after each worker launch, a session-start pointer to `project.md`
+  and the queue doc, and a delegation check that warns when the main session (never a worker)
+  writes any other file or calls a write-like MCP tool. Only the delegation check can block, and
+  only with `enforce_delegation: block`.
 
 | File | Read when |
 |---|---|
@@ -56,7 +63,7 @@ Full definitions in `references/roles.md`.
 
 | Role | One line | Serial? | Default model |
 |---|---|---|---|
-| Coordinator | Main session: plans, briefs, reviews, routes, decides, talks to the user | one | main session |
+| Coordinator | Main session (`coordinator` agent): plans, briefs, reviews, routes, decides, talks to the user; delegates all other work | one | main session |
 | Feature/system worker | Logic, tests, integration, UI for one scoped feature | parallel | mid |
 | Art owner | Models/rigs/exports/wires in one asset batch; owns an exclusive-tool slot | one per slot | strongest |
 | Prep worker | Sketches, criteria, specs, briefs so exclusive-tool owners never wait | parallel | mid |
@@ -88,6 +95,11 @@ fresh worker when a cheaper one is wanted.
 
 ## 3. Interaction rules
 
+- **The coordinator delegates.** It only plans, briefs, launches, reviews, decides, records (the
+  queue doc, the decision log, its memory, `project.md`), routes and talks to the user. Every task
+  that changes files, produces content (docs and knowledge-base pages included), researches or
+  looks things up goes to a worker, however small. Management questions (priorities, status,
+  decisions, plans, reviews) are answered directly. When unsure, delegate.
 - **Fresh worker per chunk**, with a self-contained brief. Workers have no access to the
   coordinator's memory: paths, decisions, limits and prior evidence go in the brief.
 - **Workers never talk to the user and never launch sub-workers.** They decide within scope and
@@ -108,8 +120,8 @@ fresh worker when a cheaper one is wanted.
    logs, grep logs for errors, confirm scope was respected and nothing was loosened.
 2. **Decide:** accept, accept with routed follow-ups, or send a follow-up brief (same worker if
    still running, else fresh). Never accept on a numeric pass alone.
-3. **Record:** mark the item in `<queue_doc>` with date and handoff path, plus decisions; update the
-   knowledge base if configured.
+3. **Record:** mark the item in `<queue_doc>` with date and handoff path, plus decisions in the
+   decision log; knowledge-base updates go to a knowledge-keeper worker (batch them).
 4. **Route findings:** urgent defects to the top of the queue and a brief now; the rest to the
    owner's next brief or a polish list.
 5. **Clean up:** stop the finished worker's background shells and monitors, and close idle tools it
@@ -213,7 +225,7 @@ triaged S0-S3; S0 (build break, crash, hang, data loss) goes to the top of the q
 half-done, files touched, next step); add a `PAUSED <date>` block at the top of `<queue_doc>` with
 each in-flight stream's evidence folder as a checkpoint; update the knowledge base.
 
-**Resume:** verify the tree builds (one small suite, grep for errors); fix or route breaks; relaunch
+**Resume:** have a worker verify the tree builds (one small suite, grep for errors); fix or route breaks; relaunch
 every paused stream as a **fresh** worker whose brief points at its checkpoint and warns edits may be
 partial; clear each PAUSED line as it is relaunched or delivered.
 
@@ -226,8 +238,8 @@ uploading or signing unless the user asks.
 ## 14. Knowledge base (optional)
 
 If `project.md` configures one: look up before grepping docs; update after every accepted handoff and
-user decision or correction (coordinator, or a knowledge keeper for batches); sync and lint
-periodically. Repository docs stay the raw sources, cited by path.
+user decision or correction (a knowledge-keeper worker, briefed by the coordinator, batched); sync
+and lint periodically. Repository docs stay the raw sources, cited by path.
 
 ## 15. Writing a brief
 
