@@ -6,7 +6,7 @@ A process skill that turns one main Claude Code session (the **coordinator**) an
 - roles and model choice by task difficulty;
 - worker briefs, handoffs and a coordinator review checklist;
 - the coordinator loop (review, decide, record, route, launch);
-- parallelism caps, serial slots for exclusive tools, resource limits, shared-tree hygiene;
+- parallelism caps, parallel exclusive-tool slots (e.g. several art-app instances, one owner per instance and file), resource limits, shared-tree hygiene;
 - development, QA (layers, triage S0-S3), visual and release workflows, pause/resume.
 
 ## Install

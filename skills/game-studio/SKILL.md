@@ -100,9 +100,11 @@ The coordinator keeps `<queue_doc>` as the single queue: what runs, who owns it,
 
 ## 5. Parallelism and exclusive tool slots
 
-- An **exclusive tool** has a single live session or a heavy footprint (an art/DCC app, an editor
-  instance, a device, a license seat). `project.md` lists each with its slot count, how a slot is
-  addressed (port, profile, instance) and how to launch and close it.
+- An **exclusive tool** is one whose live session must have a single driver (an art/DCC app, an
+  editor instance, a device, a license seat). It is NOT limited to one instance: run as many
+  parallel instances (slots) as the machine and licences allow (for example 4 art-app windows),
+  one owner per instance and per source file. `project.md` lists each tool with its slot count, how
+  a slot is addressed (port, profile, instance) and how to launch and close it.
 - One owner per slot; a worker only touches its own slot. Launch a slot only if a health check
   fails; never close another slot's session. Confirm no unsaved work before closing.
 - Slots run in parallel only across DIFFERENT source files and export targets. Shared sources have

@@ -32,7 +32,7 @@ Save as `project.md` beside `SKILL.md`. The skill's `<placeholders>` resolve to 
 
 | Tool | Slots | Address per slot | Launch / health check | Close rule |
 |---|---|---|---|---|
-| <e.g. art app> | <N> | <ports/profiles> | <commands> | <save check first> |
+| <e.g. art app> | <N, e.g. 4 parallel instances> | <ports/profiles> | <commands> | <save check first> |
 
 Shared single-owner sources: <files>
 
