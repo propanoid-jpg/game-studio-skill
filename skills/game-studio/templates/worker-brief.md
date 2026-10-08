@@ -41,14 +41,18 @@ ACCEPTANCE
 
 RESOURCES
 - Evidence folder: <evidence_dir>/<stream>/<task>/ (logs, user data, captures, scratch)
-- Engine runs: max <per_worker_runs> concurrent, each under <timeout>, isolated user-data dirs
-  (absolute paths), windowed only off-screen and one at a time.
+- Engine runs: max <per_worker_runs, as a number> concurrent (<total_engine_runs> across all
+  workers), each under <timeout>, isolated user-data dirs (absolute paths), windowed only
+  off-screen and one at a time.
+- Disk: evidence folder under <evidence_budget>; prune it at handoff; stop and report below
+  <min_free_disk> free.
 - Exclusive tools: <"You are the owner of slot <X> (<address>); check the connection and scene first;
   never close a session you did not launch." | "You do not own any exclusive-tool slot.">
 - Image generation: <budget N, log prompts | none>
 
 WORKER RULES (canonical: <skill_dir>/references/worker-rules.md; read it)
 <paste the "Hard limits" block from worker-rules.md>
+<paste the "Worker hard limits" section from project.md>
 
 HANDOFF
 - Write <evidence folder>/handoff.txt using <skill_dir>/templates/handoff.md.

@@ -36,12 +36,16 @@ obsolete compatibility paths in the system you change (not unrelated ones).
    regions. Explain what each region measures and which render differences are expected.
 4. **Prove the criteria discriminate:** the before capture must fail them; self-comparison and
    stability probes (small exposure change, small shift, a second run) must pass. Coarsen grids
-   rather than raise thresholds if probes are unstable, and record it.
+   rather than raise thresholds if probes are unstable, and record it. On deterministic captures,
+   where a repeat run shows no noise, include a natural-variance probe pair (another frame or
+   seed, same view) in every before set and derive each threshold from that measured noise; drop
+   and list a check that cannot separate the before state from noise instead of clamping it.
 5. **Lock** the criteria. Implement.
 6. **Compare** each iteration into a new folder; inspect crops, overlay and diff at full size.
 7. **Iterate the implementation** until checks pass. Never loosen thresholds, move regions or mask
    changed content. If the requirement genuinely changes, version the reference and criteria with a
-   written justification.
+   written justification. Rebuild a reference after a failure only from before-data and the spec
+   (same regions and formula, written reason), never from after pixels.
 8. **Manual review as a player** of the actual images, including ordinary-gameplay views:
    readability, silhouette, lighting, occlusion, text overflow, interaction. Numbers never
    establish quality. Record the review separately.
@@ -54,7 +58,9 @@ obsolete compatibility paths in the system you change (not unrelated ones).
    check proportions against the reference early; save sources under `<art_source_dir>`.
 3. **Export** through the project's pipeline into a fresh output folder; a clean export is a
    technical pass only.
-4. **Wire in** at the consumer named in the brief; one quick in-game capture.
+4. **Promote and wire in:** move the export and its import metadata into the runtime tree in one
+   step (the project's promotion tool, if any) and import immediately, then wire in at the
+   consumer named in the brief; one quick in-game capture.
 5. **Integration worker:** captures and comparisons at several resolutions, acceptance checks, seed
    sweeps and campaigns for affected content, near-miss fixes.
 6. **Coordinator promotion:** run the project's acceptance checklist; record accepted or

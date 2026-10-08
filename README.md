@@ -175,11 +175,20 @@ Set when the plugin is enabled, or later in `/config`:
 ## Customise
 
 1. Copy `skills/game-studio/project.example.md` to `<project>/.claude/game-studio/project.md` and
-   fill it in: engine, paths, test runner, capture tool, exclusive tools, resource caps, knowledge
-   base, standing user rules. Delete what does not apply. Keep the plugin options equal to it.
+   fill it in: engine, paths, test runner, capture tool, exclusive tools, resource caps, disk
+   budget, knowledge base, worker hard limits. Delete what does not apply. Keep the plugin options
+   equal to it.
 2. Optional policies (no back-compat migrations, performance last, autonomy, knowledge base) apply
    only if `project.md` opts in.
-3. The `art-owner` agent grants `mcp__blender__*`. For another art tool or server name, copy
+3. **Project rules go in `project.md`, not in a copy of the skill.** Its "Worker hard limits"
+   section holds the project's own limits and the user's durable rules (real numbers, commands,
+   tool addresses, engine traps). The coordinator pastes it into every brief after the skill's
+   "Hard limits" block; it may tighten those limits, never loosen them. Keep one copy of the skill
+   (this plugin) and update it from git; send rules any game project would want upstream.
+4. A runtime without plugin support (for example Codex) reads the same skill files from the
+   marketplace clone, `~/.claude/plugins/marketplaces/game-studio/skills/game-studio/`, which
+   `claude plugin marketplace update game-studio` keeps current.
+5. The `art-owner` agent grants `mcp__blender__*`. For another art tool or server name, copy
    `agents/art-owner.md` into `<project>/.claude/agents/`, give it a new `name`, and edit `tools`.
    Any other role can be overridden the same way.
 
@@ -191,6 +200,22 @@ The coordinator (the main session) reads `project.md` and the queue, splits task
 ownership, writes one brief per task with `/game-studio:studio-brief`, launches `game-studio:feature-dev` and
 `game-studio:ui-dev` workers, and reviews each `handoff.txt` with `/game-studio:studio-review`
 before recording acceptance and launching the next task.
+
+## Changelog
+
+- **1.2.0**
+  - Disk budget: an evidence budget per task, pruning at handoff and a free-disk check before
+    launches (`<evidence_budget>`, `<min_free_disk>` in `project.md`).
+  - `project.md` "Worker hard limits" section, pasted into every brief after the skill's hard
+    limits, so project rules never need a forked copy of the skill.
+  - Atomic asset promotion (export and import metadata together, imported at once).
+  - Locking criteria on deterministic captures: a natural-variance probe pair in every before
+    set, thresholds from measured noise, references never rebuilt from after pixels.
+  - Deterministic capture recipe, one-off engine refresh after class or asset changes, run caps
+    stated as numbers in every brief.
+  - Includes the routing by current chunk complexity across Codex and Claude, which shipped
+    without a version bump after 1.1.0.
+- **1.1.0** Coordinator main-session agent and delegation check.
 
 ## License
 

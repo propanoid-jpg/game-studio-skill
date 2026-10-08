@@ -19,6 +19,8 @@ something needs re-running, that is a follow-up brief.
 - [ ] No full test sweep (unless the user asked); no unrequested performance work, migrations or
       packaging (per the project's opt-in policies).
 - [ ] Resource caps respected; windows off-screen; no leftover shells, monitors or processes.
+- [ ] Evidence folder within the disk budget and pruned (raw captures, old iterations, scratch and
+      user-data dirs gone; handoff, criteria, references and boards kept).
 - [ ] Exclusive tools: only the named owner used its slot, within scope.
 
 ## Quality
@@ -27,7 +29,7 @@ something needs re-running, that is a follow-up brief.
       discriminating; nothing loosened or masked; versioning justified; manual player-view review
       written. Judged as a player, not by metrics.
 - [ ] Art: matches the project's style rules; technical pass is not treated as approval; promotion
-      checklist items addressed or routed.
+      checklist items addressed or routed; asset and import metadata promoted together and imported.
 - [ ] Procedural: corpus with invalid-seed and fallback counts and showcase hash stability.
 - [ ] Protected design decisions and project policies intact.
 - [ ] Owning docs updated; no task-report docs created.
@@ -41,4 +43,4 @@ something needs re-running, that is a follow-up brief.
 - [ ] Knowledge base (if configured): update owning pages and the decision log.
 - [ ] Each "For the coordinator" finding routed (S0 now; S1 next brief; S2/S3 polish list).
 - [ ] Finished worker cleaned up (shells, monitors, idle tools); next task(s) launched immediately;
-      freed exclusive-tool slot refilled first; load checked.
+      freed exclusive-tool slot refilled first; load and free disk checked.

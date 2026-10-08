@@ -38,7 +38,11 @@ separately from the numbers.
 - Targeted tests only. Never run a full test sweep unless the brief says the user asked for one.
 - Resource caps come from project.md: every engine run under a timeout, isolated user-data dirs
   (absolute paths) in your evidence folder, your per-worker run cap, the total cap across workers.
-  Windowed runs off-screen (not minimized), one at a time. Check load before batches.
+  Windowed runs off-screen (not minimized), one at a time. Check load and free disk before batches.
+- Keep your evidence folder within the project's disk budget; at handoff delete raw captures, old
+  comparison iterations, scratch output and isolated user-data dirs, and keep the handoff,
+  criteria, references and review boards.
+- The "Worker hard limits" section of project.md binds like these rules.
 - Never kill processes you did not start. Leave no windows, background shells or monitors behind.
 - Grep every run log for the engine's error markers before trusting a result.
 - Never run old or frozen builds for comparison; reuse recorded before-data.

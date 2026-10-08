@@ -58,7 +58,7 @@ the signal to delegate.
    queue doc.
 3. **Brief:** write one self-contained brief per task with `/game-studio:studio-brief` (the brief is
    the Agent prompt; workers see none of your conversation). Pick the role and model tier.
-4. **Launch:** start the role agents in parallel within the caps (check load first); refill freed
+4. **Launch:** start the role agents in parallel within the caps (check load and free disk first); refill freed
    exclusive-tool slots first. Record each launch in the queue doc.
 5. **Review:** when a worker returns, review its handoff with `/game-studio:studio-review`: open the
    key images, check claims against logs, check scope and caps. Never accept on a numeric pass alone.

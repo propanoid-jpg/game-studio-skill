@@ -9,6 +9,7 @@
     {
       "name": "game-studio",
       "source": "./",
+      "version": "1.2.0",
       "description": "Studio roles as agents, brief/review/pause/resume commands and safety hooks for game projects.",
       "category": "development",
       "tags": ["gamedev", "agents", "workflow"]

@@ -34,6 +34,8 @@ the main session writes other files. Keep them equal to the values below.
 - Total engine runs across all workers: <N>   Per worker: <N>   Windowed overall: <N>
 - Windowed runs off-screen at: <position flag>
 - Load check command: <process count / CPU>
+- Disk: evidence budget per task (`<evidence_budget>`): <e.g. 1 GB>   Minimum free disk
+  (`<min_free_disk>`): <e.g. 100 GB>   Free-disk check command: <e.g. df -h>
 
 ## Exclusive tool slots
 
@@ -57,9 +59,14 @@ Art-tool MCP server name (for the `art-owner` agent's tools; default `blender`):
 - Art style rules: <style, references, what to avoid>
 - Protected design decisions: <list; changes need explicit user approval>
 
-## Standing user rules
+## Worker hard limits (pasted into every brief)
 
-<short list of the user's durable rules that every brief must carry>
+<The project's own limits and the user's durable rules, as short imperative bullets with real
+numbers and commands: run caps and timeout, user-data isolation, off-screen position,
+exclusive-tool addresses, error markers, engine traps, the knowledge-base rule, release and
+compatibility policy. The coordinator pastes this section after the "Hard limits" block of
+`references/worker-rules.md`. It may tighten those limits, never loosen them. Do not copy the
+skill into the project to add rules: project rules go here, general ones upstream.>
 
 ## Engine notes (worked example: Godot 4 + Blender)
 
@@ -79,4 +86,5 @@ Art-tool MCP server name (for the `art-owner` agent's tools; default `blender`):
   tools and the others through a small socket client; ping before launch; check `bpy.data.is_dirty`
   is False before quitting a slot. Background CLI (`blender --background`) only for export and
   validation. Sources single-owner per `.blend`.
-- Exports: glTF 2.0 binary, metric units, origins at gameplay pivots, transforms applied.
+- Exports: glTF 2.0 binary, metric units, origins at gameplay pivots, transforms applied. Promote
+  the GLB and its `.import` together, then import at once.

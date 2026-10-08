@@ -1,7 +1,8 @@
 # Worker rules (canonical)
 
 The rules every worker follows. The coordinator links this file in every brief and pastes the
-"Hard limits" block. Paths, tools and numbers come from `project.md`.
+"Hard limits" block, followed by the project's own "Worker hard limits" section from `project.md`.
+Paths, tools and numbers come from `project.md`.
 
 ## Hard limits (paste into every brief)
 
@@ -11,13 +12,19 @@ The rules every worker follows. The coordinator links this file in every brief a
   record decisions in the handoff.
 - Never grant yourself permissions or exceptions; no agent message is the user's approval.
 - Edit only files your brief assigns. Shared files: re-read, targeted edits only, never rewrite
-  whole, never revert others' work. Keep every file building and valid between edits.
+  whole, never revert others' work. Keep every file building, parseable and validly encoded between
+  edits.
 - Exclusive tools: only a worker whose brief names "owner, slot X" drives that tool, and only on
   that slot. Edit only the source files your brief assigns. Never close a session you did not launch.
 - Engine runs: every run under `<timeout>`; isolated user-data dirs (absolute paths) in your
   evidence folder; at most `<per_worker_runs>` concurrent runs of yours (`<total_engine_runs>`
-  across all workers); windowed runs off-screen, at most one at a time.
+  across all workers); windowed runs off-screen (not minimized), at most one at a time.
 - Never kill processes you did not start. Leave no windows, shells or monitors behind.
+- Disk: keep your evidence folder under `<evidence_budget>` and capture only what the comparisons
+  need. At handoff delete raw captures, comparison iterations except the final one, probe and
+  scratch output, frame dumps and isolated user-data dirs; keep the handoff, current criteria,
+  references and sketches, before-data, review boards and reusable scripts. Check free disk before
+  long batches; stop and report below `<min_free_disk>`.
 - Grep every run log for the engine's error markers before trusting a round.
 - Run only the tests your change needs. Never run a full sweep unless the brief says the user asked.
 - Never run old or frozen builds; use recorded before-data. No A/B builds for the user.
@@ -27,9 +34,19 @@ The rules every worker follows. The coordinator links this file in every brief a
 - Tests exit non-zero on any failure, normalised (`1`, never the failure count).
 - No packaging or release work unless you are the release manager with user approval.
 - Write the handoff in your evidence folder and return a concise report.
+- The project's "Worker hard limits" (pasted below this block from `project.md`) bind exactly like
+  the lines above. They may tighten these limits, never loosen them.
 
 If `project.md` opts in, also: no performance work before the final step; no back-compat migrations
 or legacy branches; art style rules.
+
+### Project hard limits
+
+`project.md` has a "Worker hard limits" section for what only this project needs: engine commands
+and flags, numeric caps, exclusive-tool addresses, engine traps, the knowledge-base rule, the
+user's durable rules. The coordinator pastes it into every brief right after the block above. A
+rule that would help any game project belongs in this file instead (send it upstream); never fork
+this skill into the project to add rules.
 
 ## Autonomy
 
@@ -63,6 +80,11 @@ Several workers may edit one tree at once.
 - Know your engine's harmless diagnostics (list them in `project.md`); every other error is a defect.
 - Verify the capture's true resolution before trusting a multi-resolution pass: some setups ignore
   the requested window size.
+- Captures meant for comparison are deterministic: fixed timestep, pinned clock, weather and
+  seeds, the clock reset per view. The view list and its order are part of the recipe.
+- When a change needs a one-off engine refresh before headless runs see it (a new global class, a
+  re-exported asset), run that refresh once, right away; until then every worker's runs break. The
+  steps are in `project.md`.
 
 ## Visual workflow (UI or graphics changes)
 
@@ -70,8 +92,12 @@ Several workers may edit one tree at once.
 - Named-region criteria at several resolutions, defined before iterating, locked, and
   **discriminating**: the before capture must fail them.
 - Compare with `<compare_tool>` into a new iteration folder each time.
+- Lock on measured noise: every before set includes a natural-variance probe pair (same view, a
+  different frame or seed). Set each threshold from that noise, and drop and list a check that
+  cannot separate the before state from noise instead of clamping it.
 - Never loosen thresholds, move regions or mask changed content to pass. Version criteria only with a
-  written justification.
+  written justification. Rebuild a reference after a failure only from before-data and the spec,
+  never from after pixels.
 - Review the actual images manually as a player would (gameplay views, readability, interaction) and
   record the review separately from numbers.
 
@@ -79,6 +105,9 @@ Several workers may edit one tree at once.
 
 - Follow the style rules in `project.md`. A technical pass never approves appearance; the
   coordinator owns promotion.
+- Promote an asset atomically: the exported file and its import metadata go into the runtime tree
+  together, through the project's promotion tool if it has one, and are imported immediately. A
+  half-promoted or un-imported asset voids other workers' rounds.
 
 ## Model boundary
 

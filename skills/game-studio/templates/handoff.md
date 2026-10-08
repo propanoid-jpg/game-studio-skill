@@ -24,6 +24,7 @@ RESULTS
 - Manual review: <what was looked at in the actual images, as a player, and what it shows>.
 - Balance/other tables: <before -> after, with the before-data source>.
 - Images to open first: <3-6 paths>.
+- Evidence pruned: yes/no; folder size <N>; kept: <handoff, criteria, references, boards, ...>.
 
 NOT DONE / LIMITS
 - <what is not verified or not claimed, honestly>

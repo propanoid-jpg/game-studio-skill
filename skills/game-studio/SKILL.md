@@ -17,6 +17,12 @@ next to this file when the skill is copied into a project (start from `project.e
 project's instruction file and the user's latest explicit corrections win over this skill on any
 conflict.
 
+**One copy.** Keep the skill in one place and update it from its git repository. Project rules go
+in `project.md` (its "Worker hard limits" section is pasted into every brief), never in an edited
+copy of the skill. A runtime without plugin support reads the same files from the marketplace
+clone (`~/.claude/plugins/marketplaces/game-studio/skills/game-studio/`), which
+`claude plugin marketplace update game-studio` keeps current.
+
 **Plugin install.** When this skill is installed as the `game-studio` plugin:
 
 - The main session runs as the `game-studio:coordinator` agent (plugin setting `agent`): it can
@@ -43,7 +49,7 @@ conflict.
 |---|---|
 | `project.md` | start of every session: the project's paths, tools, caps and policies |
 | `references/roles.md` | choosing a role, writing a brief, routing a finding |
-| `references/worker-rules.md` | CANONICAL worker rules; paste the hard limits into every brief |
+| `references/worker-rules.md` | CANONICAL worker rules; paste the hard limits plus `project.md` "Worker hard limits" into every brief |
 | `references/workflow.md` | planning or implementing a feature, UI/graphics or art change |
 | `references/qa.md` | testing, corpora, bots, balance tables, triage |
 | `references/release.md` | only after explicit user approval of a release |
@@ -55,7 +61,7 @@ conflict.
    urgent items, latest user directions.
 2. If a knowledge base is configured, query it before grepping raw docs.
 3. After a pause or crash, confirm the tree builds first (section 12).
-4. Check machine load before launching anything (section 6).
+4. Check machine load and free disk before launching anything (section 6).
 
 ## 2. Roles
 
@@ -165,7 +171,8 @@ corpus integration, or `model: "gpt-6-luna"` for an exact named-test run. Claude
 4. **Route findings:** urgent defects to the top of the queue and a brief now; the rest to the
    owner's next brief or a polish list.
 5. **Clean up:** stop the finished worker's background shells and monitors, and close idle tools it
-   launched (after checking there is no unsaved work). Never close what you did not start.
+   launched (after checking there is no unsaved work). Never close what you did not start. Confirm
+   the worker pruned its evidence folder to the disk budget.
 6. **Launch the next task(s) immediately**, keeping useful workers busy within the caps. Refill a
    freed exclusive-tool slot first.
 
@@ -191,8 +198,14 @@ The coordinator keeps `<queue_doc>` as the single queue: what runs, who owns it,
 ## 6. Resource limits (hard; numbers come from `project.md`)
 
 - At most `<total_engine_runs>` engine runs across ALL workers together; each worker at most
-  `<per_worker_runs>` concurrently, queued (never fire all seeds at once).
-- Check real load (process count, CPU) before launching workers or batches; queue when high.
+  `<per_worker_runs>` concurrently, queued (never fire all seeds at once). State the number in
+  every brief.
+- Check real load (process count, CPU) and free disk before launching workers or batches; queue
+  when load is high, and stop launching below `<min_free_disk>`.
+- Disk: each task's evidence folder stays under `<evidence_budget>`. At handoff the worker deletes
+  raw captures, superseded comparison iterations, probe and scratch output, frame dumps and
+  isolated user-data dirs, and keeps the handoff, criteria, references, sketches, before-data and
+  review boards.
 - Every engine run under a timeout, with isolated user-data directories inside the task's evidence
   folder. Never touch a real player profile.
 - Windowed runs off-screen (not minimized), at most one per worker and `<total_windowed>` overall.
@@ -243,7 +256,9 @@ The coordinator keeps `<queue_doc>` as the single queue: what runs, who owns it,
    discriminating named-region criteria at several resolutions (the before state fails them),
    implement, compare into a new iteration folder, iterate. Never loosen thresholds or mask regions.
    Always review the actual images.
-5. Run targeted tests and a build/parse check; write the handoff.
+5. **Art:** promote an exported asset and its import metadata together and import at once; a
+   half-promoted asset voids other workers' rounds.
+6. Run targeted tests and a build/parse check; write the handoff.
 
 ## 11. QA (detail in `references/qa.md`)
 
@@ -285,5 +300,6 @@ and lint periodically. Repository docs stay the raw sources, cited by path.
 
 Use `templates/worker-brief.md`. Every brief states: role, one-sentence goal, scope and non-goals;
 files owned and shared; inputs (queue lines, docs, prior handoffs, before-data); acceptance
-criteria; resource caps, exclusive-tool status, evidence folder; the pasted worker-rule hard
-limits; the handoff format and the next owner.
+criteria; resource caps as numbers, the disk budget, exclusive-tool status, evidence folder; the
+pasted worker-rule hard limits followed by the "Worker hard limits" section of `project.md`; the
+handoff format and the next owner.

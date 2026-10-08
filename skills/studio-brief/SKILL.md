@@ -21,10 +21,11 @@ Coordinator (or `game-studio:coordinator-helper`). Follows section 15 of the `ga
    before-data. The worker sees none of your conversation: paths, decisions and limits go in the brief.
 3. Name owned and shared files so parallel workers never overlap; name the exclusive-tool slot for an
    art owner ("owner, slot X") or state that the worker owns none.
-4. Evidence folder: `<evidence_dir>/<stream>/<task>/` (from project.md; plugin option `evidence_dir`). Engine caps from `project.md`.
+4. Evidence folder: `<evidence_dir>/<stream>/<task>/` (from project.md; plugin option `evidence_dir`). Engine caps
+   (as numbers) and the disk budget from `project.md`.
 5. Paste the "Hard limits" block from
-   `${CLAUDE_PLUGIN_ROOT}/skills/game-studio/references/worker-rules.md` verbatim, plus the project's
-   standing user rules from `project.md`.
+   `${CLAUDE_PLUGIN_ROOT}/skills/game-studio/references/worker-rules.md` verbatim, then the
+   "Worker hard limits" section of `project.md` verbatim.
 6. Add the role-specific lines from the template. In Claude, launch with the Agent tool using
    `subagent_type: "game-studio:<role>"`. In Codex, use `collaboration.spawn_agent` with `task_name`,
    `message`, the mapped `model`, and `fork_turns: "none"` for a fresh worker. Record the launch in the queue doc.

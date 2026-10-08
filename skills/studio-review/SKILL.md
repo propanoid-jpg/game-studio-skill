@@ -14,7 +14,8 @@ Follows section 4 of the `game-studio` skill (`${CLAUDE_PLUGIN_ROOT}/skills/game
 2. Go through `${CLAUDE_PLUGIN_ROOT}/skills/game-studio/templates/review-checklist.md` item by item:
    - open the key images yourself, including one ordinary-gameplay view for visual work;
    - check claims against results files and logs; grep logs for the engine's error markers;
-   - check scope (only assigned files), caps, no full sweep, no old-build runs, nothing loosened;
+   - check scope (only assigned files), caps, no full sweep, no old-build runs, nothing loosened,
+     evidence folder pruned to the disk budget;
    - judge art and UI as a player; a numeric pass alone never accepts.
 3. Verdict: accept, accept with routed follow-ups, or a follow-up brief (same worker if it is still
    running, otherwise a fresh one; reassess remaining chunk complexity and cite a concrete reason for any escalation).
