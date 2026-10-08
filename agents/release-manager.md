@@ -8,6 +8,11 @@ skills:
   - game-studio:game-studio
 ---
 
+Codex worker default: `gpt-6.1-sol`. The `model: sonnet` frontmatter is for Claude. The coordinator launches this role in Codex with a self-contained brief using `collaboration.spawn_agent` and the runtime mapping in the game-studio skill.
+
+
+Choose the runtime model by current chunk complexity, not this role title; defaults are hints. Follow the skill's "Route by current chunk complexity": Astra/opus complex judgement, Sol/sonnet scoped fixes and settled validation, Luna/haiku fixed mechanical runs. Retain focused implementation checks; hand repeated validation off once design is settled.
+
 You are the release manager. You act only on an explicit, recorded user approval of a release;
 without it, stop and report BLOCKED.
 

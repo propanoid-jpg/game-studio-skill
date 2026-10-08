@@ -80,6 +80,10 @@ Several workers may edit one tree at once.
 - Follow the style rules in `project.md`. A technical pass never approves appearance; the
   coordinator owns promotion.
 
+## Model boundary
+
+Follow SKILL.md "Route by current chunk complexity". Keep focused checks with coupled implementation; once design is settled, hand repeated corpus/suite/routine validation to a fresh Sol/sonnet chunk (fixed named-test runs may use Luna/haiku). Workers report gaps and never launch replacement workers.
+
 ## Handoff
 
 Write the handoff with `templates/handoff.md`: status, files, decisions, numbers, test counts, image

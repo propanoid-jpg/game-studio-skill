@@ -97,6 +97,26 @@ start, keep the shared tree parseable, judge like a player, sketch-first visual 
 handoff, never talks to the user and has no Agent tool, so it cannot launch sub-agents. A `model`
 passed at launch overrides the default below.
 
+Role defaults are hints: route each current chunk by complexity. Once complex design is settled, repeated validation moves to a fresh Sol/sonnet chunk; fixed named-test runs may use Luna/haiku. See the skill routing policy.
+
+### Runtime model mapping
+
+Choose the launch API and model for the active runtime. Keep the coordinator on its current session model.
+
+| Task tier | Codex model | Claude model |
+|---|---|---|
+| Light / cheapest | `gpt-6-luna` | `haiku` |
+| Medium / mid | `gpt-6.1-sol` | `sonnet` |
+| Complex / strongest | `gpt-6-astra` | `opus` |
+
+In Claude, launch `game-studio:<role>` with the Agent tool and pass the Claude model. The `model`
+frontmatter in `agents/*.md` is Claude-specific. In Codex, use `collaboration.spawn_agent` with
+`task_name`, a self-contained role brief in `message`, and the Codex `model`. Set `fork_turns: "none"`
+(or a positive turn count when needed) when overriding the model; full-history forks inherit the
+coordinator's model. Codex does not accept `subagent_type` or Claude role-agent identifiers.
+Read the relevant role instructions into the brief; a Claude plugin installation does not register
+role agents in Codex. Never pass `haiku`, `sonnet` or `opus` as a Codex model.
+
 | Agent | Role | Model |
 |---|---|---|
 | `feature-dev` | One scoped feature or system change | sonnet (pass opus for unknown-cause debugging) |
@@ -110,7 +130,7 @@ passed at launch overrides the default below.
 | `knowledge-keeper` | Knowledge-base sync and lint | haiku |
 | `release-manager` | Release checklist and packaging, only on user approval | sonnet |
 | `surveyor` | Read-only inventories, grep audits, log summaries | haiku |
-| `coordinator-helper` | Drafts briefs and pre-reviews handoffs (optional) | opus |
+| `coordinator-helper` | Drafts briefs and pre-reviews handoffs (optional) | sonnet |
 | `coordinator` | The main session (set by the plugin), not launched as a worker | the session's model |
 
 ### Hooks

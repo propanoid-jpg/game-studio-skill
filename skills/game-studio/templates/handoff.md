@@ -32,6 +32,8 @@ FOR THE COORDINATOR (outside my scope; not edited)
 1. [S0|S1|S2|S3] <area/owner>: <finding> - evidence: <path, seed, command, log line>.
 
 NEXT
+- Remaining validation: <exact checks/criteria/evidence; settled design or unresolved root cause>.
+- Next model: <runtime-valid model and current chunk complexity reason>.
 - Next owner: <role and task>.
 - Resume point (if PARTIAL): <exact next step, files mid-edit>.
 ```

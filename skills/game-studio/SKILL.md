@@ -23,7 +23,7 @@ conflict.
   launch and message workers, read, run read-only shell checks and edit only the queue doc, the
   decision log, its memory and `project.md`. It has no Write or MCP tools. Opt out with your own
   `agent` setting (see the plugin README).
-- Launch workers as the role agents `game-studio:<role>` (`feature-dev`, `ui-dev`, `art-owner`,
+- In Claude, launch workers as the role agents `game-studio:<role>` (`feature-dev`, `ui-dev`, `art-owner`,
   `prep`, `integration`, `qa`, `balance`, `visual-review`, `knowledge-keeper`, `release-manager`,
   `surveyor`, `coordinator-helper`) instead of a general-purpose agent. Each preloads this skill,
   carries the hard worker rules and has no Agent tool. A `model` passed at launch overrides its default.
@@ -74,9 +74,27 @@ Full definitions in `references/roles.md`.
 | Knowledge keeper | Knowledge-base sync and lint (if configured) | parallel | cheapest |
 | Release manager | Packages a release, ONLY on explicit user approval | one | mid |
 | Surveyor | Read-only inventories, grep audits, log summaries | parallel | cheapest |
-| Coordinator helper (optional) | Drafts briefs, pre-reviews handoffs; never decides | parallel | strongest |
+| Coordinator helper (optional) | Drafts briefs, pre-reviews handoffs; never decides | parallel | mid |
 
 UI work is a feature worker specialised on the sketch-first visual workflow (`ui-dev` agent).
+
+### Runtime model mapping
+
+Choose the launch API and model for the active runtime. Keep the coordinator on its current session model.
+
+| Task tier | Codex model | Claude model |
+|---|---|---|
+| Light / cheapest | `gpt-6-luna` | `haiku` |
+| Medium / mid | `gpt-6.1-sol` | `sonnet` |
+| Complex / strongest | `gpt-6-astra` | `opus` |
+
+In Claude, launch `game-studio:<role>` with the Agent tool and pass the Claude model. The `model`
+frontmatter in `agents/*.md` is Claude-specific. In Codex, use `collaboration.spawn_agent` with
+`task_name`, a self-contained role brief in `message`, and the Codex `model`. Set `fork_turns: "none"`
+(or a positive turn count when needed) when overriding the model; full-history forks inherit the
+coordinator's model. Codex does not accept `subagent_type` or Claude role-agent identifiers.
+Read the relevant role instructions into the brief; a Claude plugin installation does not register
+role agents in Codex. Never pass `haiku`, `sonnet` or `opus` as a Codex model.
 
 ### Model choice
 
@@ -89,9 +107,31 @@ failed review, not by default.
 | mid | Scoped workers with a clear brief: stale tests, one feature or bug with a known cause, UI against locked sketches, prep captures, sweeps, packaging. |
 | strongest | Judgement-heavy work: live art modelling and review, readability reviews, unknown-cause debugging, balance design, cross-system changes, design trade-offs. |
 
-The model never changes the rules. If a cheaper worker's handoff fails review, relaunch the remainder
-as a fresh worker one tier up and say what failed. A fork inherits the coordinator's model; use a
+The model never changes the rules. If a cheaper worker's handoff fails review, reassess the remaining chunk and relaunch a fresh worker with a concrete complexity/failure reason for any escalation. A fork inherits the coordinator's model; use a
 fresh worker when a cheaper one is wanted.
+
+### Route by current chunk complexity
+
+Choose the model for the current chunk, not the role title or its previous model. Role defaults
+are starting hints only; pass the runtime-valid model on every launch. Use Astra/opus for creative
+modelling, visual judgement, unknown-cause or cross-system complex diagnosis and balance design;
+Sol/sonnet for scoped known-cause fixes, known-criteria integration/validation, medium preparation
+and test-health triage; Luna/haiku for fixed named-test runs, log/status/inventory audits and
+mechanical edits. Coordinator helpers normally use Sol/sonnet; visual judgement may need Astra/opus.
+
+An Astra/opus implementer may perform focused checks needed to implement the change and one quick
+final gameplay review. Once design/root cause is settled, hand repeated corpus, suite and routine
+validation to a fresh Sol/sonnet integration or QA chunk; fixed isolated runs may use Luna/haiku.
+Name the exact remaining checks, criteria, files, evidence and next model in the handoff. Keep
+coupled complex implementation together: do not delegate every command or switch models mid-chunk.
+Escalate only for concrete complexity or a documented failure/root-cause gap, not merely because
+an ordinary test failed. Workers report the gap; the coordinator briefs a fresh worker, preserving
+ownership, resource, visual and approval rules. Full sweeps still require the user's request.
+
+Codex fresh launch examples: `collaboration.spawn_agent` with `fork_turns: "none"`, a self-contained
+role brief, and `model: "gpt-6-astra"` for unknown-cause diagnosis, `model: "gpt-6.1-sol"` for settled
+corpus integration, or `model: "gpt-6-luna"` for an exact named-test run. Claude uses the equivalent
+`opus`/`sonnet`/`haiku` override on its Agent tool. Keep the coordinator's current model.
 
 ## 3. Interaction rules
 

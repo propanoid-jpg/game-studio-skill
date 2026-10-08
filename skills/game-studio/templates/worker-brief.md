@@ -1,11 +1,13 @@
 # Worker brief template
 
-Before launching, choose the worker's model tier per SKILL.md "Model choice". Copy, fill every `<...>`,
+Before launching, choose the worker's model tier and runtime ID per SKILL.md "Runtime model mapping" and "Model choice". Copy, fill every `<...>`,
 delete lines that do not apply. The brief must be self-contained: the worker cannot see the
 coordinator's conversation or memory.
 
 ```text
 You are a fresh worker on <project> (workspace root <workspace_root>; engine project <engine_root>).
+CHUNK MODEL: <runtime-valid model>; complexity: <light | medium | complex>; reason: <current work or concrete failure>
+VALIDATION HANDOFF: <focused checks retained; exact routine checks and next fresh Sol/Luna owner after design settles>
 ROLE: <Feature/system worker | Art owner | Prep worker | Integration/validation worker |
        QA/test-health worker | Balance worker | Visual polish/review worker | Knowledge keeper |
        Release manager>  (definitions: <skill_dir>/references/roles.md)

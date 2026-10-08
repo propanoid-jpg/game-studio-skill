@@ -32,6 +32,8 @@ something needs re-running, that is a follow-up brief.
 - [ ] Protected design decisions and project policies intact.
 - [ ] Owning docs updated; no task-report docs created.
 
+- [ ] Next model follows remaining chunk complexity; settled routine validation leaves Astra/opus, with exact checks and ownership handed to fresh Sol/sonnet or fixed-run Luna/haiku. Escalations cite concrete complexity/failure.
+
 ## Decide and record
 
 - [ ] Verdict: accept / accept with follow-ups / follow-up brief (same worker if running, else fresh).
