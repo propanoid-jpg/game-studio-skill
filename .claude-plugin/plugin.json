@@ -1,7 +1,7 @@
 {
   "name": "game-studio",
   "displayName": "Game Studio",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Run a game project as a small studio: a coordinator main session that delegates every task to fresh role agents (feature, UI, art owner, prep, integration, QA, balance, visual review, knowledge keeper, release), with briefs, handoffs, review, pause/resume and safety hooks. Engine- and art-pipeline-agnostic.",
   "author": {
     "name": "propanoid-jpg",
@@ -10,7 +10,17 @@
   "homepage": "https://github.com/propanoid-jpg/game-studio-skill",
   "repository": "https://github.com/propanoid-jpg/game-studio-skill",
   "license": "MIT",
-  "keywords": ["gamedev", "game-studio", "agents", "workflow", "qa", "godot", "unity", "unreal", "blender"],
+  "keywords": [
+    "gamedev",
+    "game-studio",
+    "agents",
+    "workflow",
+    "qa",
+    "godot",
+    "unity",
+    "unreal",
+    "blender"
+  ],
   "userConfig": {
     "engine_process": {
       "type": "string",

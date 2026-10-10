@@ -55,6 +55,10 @@ clone (`~/.claude/plugins/marketplaces/game-studio/skills/game-studio/`), which
 | `references/release.md` | only after explicit user approval of a release |
 | `templates/*.md` | briefs, handoffs, handoff review |
 
+**Codex adapter.** For installation, native role discovery, fresh-worker launch requests and explicit
+resource checks, read [references/codex.md](references/codex.md). In Codex, prefer
+`.codex/game-studio/project.md`, then the existing Claude studio project paths.
+
 ## 1. Start of a session or workstream
 
 1. Read `project.md`, the project's instruction file and the task queue (`<queue_doc>`): pauses,
@@ -97,7 +101,7 @@ Choose the launch API and model for the active runtime. Keep the coordinator on 
 In Claude, launch `game-studio:<role>` with the Agent tool and pass the Claude model. The `model`
 frontmatter in `agents/*.md` is Claude-specific. In Codex, use `collaboration.spawn_agent` with
 `task_name`, a self-contained role brief in `message`, and the Codex `model`. Set `fork_turns: "none"`
-(or a positive turn count when needed) when overriding the model; full-history forks inherit the
+when overriding the model; `"all"` full-history forks inherit the
 coordinator's model. Codex does not accept `subagent_type` or Claude role-agent identifiers.
 Read the relevant role instructions into the brief; a Claude plugin installation does not register
 role agents in Codex. Never pass `haiku`, `sonnet` or `opus` as a Codex model.

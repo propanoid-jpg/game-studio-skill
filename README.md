@@ -1,4 +1,4 @@
-# game-studio plugin for Claude Code
+# game-studio plugin for Claude Code and Codex
 
 A Claude Code plugin that turns one main session (the **coordinator**) and many fresh **workers**
 into a small game studio. It is engine- and art-pipeline-agnostic. It bundles:
@@ -49,6 +49,24 @@ In Claude Code: `/plugin marketplace update game-studio`, then update `game-stud
 
 **Skill only (no plugin):** copy `skills/game-studio/` into `<project>/.claude/skills/game-studio/`
 or `~/.claude/skills/game-studio/`. You get the process, without agents, commands, hooks or options.
+
+### Codex installation
+
+From a persistent clone of this repository (Python 3.11+):
+
+```text
+python scripts/codex_adapter.py install --project /absolute/path/to/game
+```
+
+This installs 12 native Codex worker roles, discoverable skill pointers and coordinator instructions
+into the target project. Fill the generated studio project file, restart Codex, and verify role
+discovery. Re-run installation after updating or moving the clone. Existing project instructions
+are preserved; global Codex settings and permissions are not changed.
+
+See [the Codex adapter reference](skills/game-studio/references/codex.md) for launch requests,
+model routing, resource preflight, exclusive-tool leases and runtime limits. Sessions without
+named-agent spawning use self-contained role briefs. Claude hooks and tool allowlists do not
+automatically apply in Codex; the adapter documents which checks are explicit and advisory.
 
 ## What's inside
 
@@ -112,7 +130,7 @@ Choose the launch API and model for the active runtime. Keep the coordinator on 
 In Claude, launch `game-studio:<role>` with the Agent tool and pass the Claude model. The `model`
 frontmatter in `agents/*.md` is Claude-specific. In Codex, use `collaboration.spawn_agent` with
 `task_name`, a self-contained role brief in `message`, and the Codex `model`. Set `fork_turns: "none"`
-(or a positive turn count when needed) when overriding the model; full-history forks inherit the
+when overriding the model; `"all"` full-history forks inherit the
 coordinator's model. Codex does not accept `subagent_type` or Claude role-agent identifiers.
 Read the relevant role instructions into the brief; a Claude plugin installation does not register
 role agents in Codex. Never pass `haiku`, `sonnet` or `opus` as a Codex model.
@@ -185,7 +203,7 @@ Set when the plugin is enabled, or later in `/config`:
    tool addresses, engine traps). The coordinator pastes it into every brief after the skill's
    "Hard limits" block; it may tighten those limits, never loosen them. Keep one copy of the skill
    (this plugin) and update it from git; send rules any game project would want upstream.
-4. A runtime without plugin support (for example Codex) reads the same skill files from the
+4. A runtime using the manual without an adapter reads the same skill files from the
    marketplace clone, `~/.claude/plugins/marketplaces/game-studio/skills/game-studio/`, which
    `claude plugin marketplace update game-studio` keeps current.
 5. The `art-owner` agent grants `mcp__blender__*`. For another art tool or server name, copy
@@ -202,6 +220,12 @@ ownership, writes one brief per task with `/game-studio:studio-brief`, launches 
 before recording acceptance and launching the next task.
 
 ## Changelog
+
+- **1.3.0**
+  - Codex project adapter: 12 native worker roles, skill discovery and coordinator activation.
+  - Self-contained spawn-request composer with Luna/Sol/Astra routing and correct fork modes.
+  - Resource preflight and atomic exclusive-tool/shared-source leases.
+  - Documented runtime permissions, hook and concurrency limits; installer and lease regression checks.
 
 - **1.2.0**
   - Disk budget: an evidence budget per task, pruning at handoff and a free-disk check before
