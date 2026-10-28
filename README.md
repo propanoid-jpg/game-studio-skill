@@ -18,7 +18,8 @@ into a small game studio. It is engine- and art-pipeline-agnostic. It bundles:
   anatomy), skill animation and VFX identity (fingerprints and the distance rule), boss encounters
   (movement portfolio, attack coverage, adds law) and the fun profile (moment targets, playtests);
 - **role agents**, so workers launch as named studio roles instead of a general-purpose agent;
-- **coordinator commands** for briefs, reviews, pause and resume;
+- **coordinator commands** for briefs, reviews, pause, resume, asset setup and vault setup;
+- **knowledge vault**: an Obsidian vault built by a one-time sweep of all project docs, then maintained by incremental sync, with a query-first rule for every worker and a deterministic lint script for dead links, orphans, index drift and source-hash drift (adapted llm-wiki method, no external plugin);
 - **hooks** (delegation check, engine-run cap warning, review reminder, session-start pointer);
 - **options** for the queue doc, decision log, evidence folder, engine-process cap and delegation
   enforcement.
@@ -86,6 +87,7 @@ skills/studio-review/             /game-studio:studio-review <handoff>
 skills/studio-pause/              /game-studio:studio-pause [reason]
 skills/studio-resume/             /game-studio:studio-resume [stream ...]
 skills/studio-setup-assets/       /game-studio:studio-setup-assets — gated, resumable local pipeline setup
+skills/studio-setup-wiki/         /game-studio:studio-setup-wiki — gated, resumable one-time vault sweep, then incremental sync
 agents/                           the coordinator and one agent per studio role
 settings.json                     runs the main session as game-studio:coordinator
 hooks/hooks.json, scripts/        hooks
@@ -155,7 +157,7 @@ role agents in Codex. Never pass `haiku`, `sonnet` or `opus` as a Codex model.
 | `qa` | Test sweeps (only when the user asks), stale and flaky tests | sonnet |
 | `balance` | Probes, tuning, before/after tables | opus |
 | `visual-review` | Live-play readability review and presentation polish | opus |
-| `knowledge-keeper` | Knowledge-base sync and lint | haiku |
+| `knowledge-keeper` | Vault setup, sync, compile and lint | haiku |
 | `release-manager` | Release checklist and packaging, only on user approval | sonnet |
 | `surveyor` | Read-only inventories, grep audits, log summaries | haiku |
 | `coordinator-helper` | Drafts briefs and pre-reviews handoffs (optional) | sonnet |
@@ -231,6 +233,21 @@ ownership, writes one brief per task with `/game-studio:studio-brief`, launches 
 before recording acceptance and launching the next task.
 
 ## Changelog
+
+- **1.5.0**
+  - Knowledge vault: absorbed llm-wiki method (MIT, attributed) as `references/knowledge-vault.md`
+    with no external plugin dependency — Obsidian layout, query-first enforcement in the core
+    skill, worker rules, brief and review templates, and the knowledge-keeper role.
+  - New command `studio-setup-wiki`: phased, resumable, gated one-time sweep of all in-scope
+    docs, external-source ingest to immutable `raw/`, compile to cross-linked wiki pages with
+    source-path and source-hash frontmatter, lint and smoke-query proof, then incremental sync.
+  - New deterministic `scripts/wiki-lint.py` (stdlib only) and tests: dead links, orphans,
+    index drift, stale pages, missing gaps sections, contradiction warnings and source-hash
+    drift, with `--fix` for stubs and missing sections. Repo docs are never copied into `raw/`;
+    qmd is used only if already installed, never installed; vault git commits only if the
+    vault is already tracked; workers never delete a vault.
+  - Codex adapter now installs 7 skill pointers (game-studio plus six commands); worker count
+    stays at 14.
 
 - **1.4.0**
   - Local generation pipelines: ComfyUI topology with a single GPU slot, MCP and reusable REST

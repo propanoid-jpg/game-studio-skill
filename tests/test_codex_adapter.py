@@ -35,7 +35,9 @@ class AdapterTests(unittest.TestCase):
             self.assertIn(str(a.ROOT), profile["developer_instructions"])
         surveyor = tomllib.loads((self.project / ".codex/agents/game-studio-surveyor.toml").read_text(encoding="utf-8"))
         self.assertEqual(surveyor["sandbox_mode"], "read-only")
-        self.assertEqual(len(list((self.project / ".agents/skills").glob("*/SKILL.md"))), 6)
+        # game-studio plus six command skills (brief, review, pause, resume,
+        # setup-assets, setup-wiki).
+        self.assertEqual(len(list((self.project / ".agents/skills").glob("*/SKILL.md"))), 7)
 
     def test_collision_does_not_partially_install(self):
         path = self.project / ".codex/agents/game-studio-qa.toml"
@@ -101,7 +103,7 @@ class AdapterTests(unittest.TestCase):
     def test_release_versions_match(self):
         plugin = json.loads(a.read(a.ROOT / ".claude-plugin/plugin.json"))
         market = json.loads(a.read(a.ROOT / ".claude-plugin/marketplace.json"))
-        self.assertEqual(plugin["version"], "1.4.0")
+        self.assertEqual(plugin["version"], "1.5.0")
         self.assertEqual(market["plugins"][0]["version"], plugin["version"])
 
 

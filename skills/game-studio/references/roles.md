@@ -194,10 +194,14 @@ manual review notes. Reviews as a player, not by metrics.
 
 ---
 
-## Knowledge keeper (if a knowledge base is configured)
+## Knowledge keeper (owns the vault)
 
-**Responsibilities:** sync, compile, update and lint for batches of accepted work; keeps the index
-consistent; touches no game files. **Outputs:** updated pages and a lint report.
+**Responsibilities:** own the project's Obsidian vault per `knowledge-vault.md`: query-first
+support, one-time setup (`studio-setup-wiki`), incremental sync, compile, update and lint for
+accepted work; keeps the index, links and log consistent; touches no game files.
+**Outputs:** updated pages, a lint report, and any vault gap or contradiction flagged for the
+coordinator. Routine lookups are never filed to the vault; only durable answers are, by keeper
+brief. The keeper never deletes a vault.
 
 ---
 
@@ -220,7 +224,7 @@ user asks. **Hands off when:** COMPLETE or BLOCKED with the owner of each blocke
 | Placement, near-miss comparison | integration/validation worker |
 | Tuning, difficulty, economy | balance worker |
 | Readability, lighting, UI clutter | visual polish/review worker |
-| Doc or knowledge-base drift | knowledge keeper |
+| Doc or vault drift | knowledge keeper |
 | Protected design conflict | coordinator, then the user |
 | Generated-asset licence problem (engine, model or input not cleared; gated engine) | coordinator, then the user if a gate must be accepted |
 | Generated geometry / post problem (mesh budget, tiling, render check) | asset-gen queue (with the prep packet) |

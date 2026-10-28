@@ -13,6 +13,8 @@ CHANGES
 - <path>: <what changed and why, one line each>
 - Tests changed: <path>: <stale -> current behaviour | de-flaked | bounded>, dated comment, no coverage removed.
 - Docs updated: <path>: <section>
+- Vault lookup: <pages consulted | "vault does not answer: <question>" | "no vault configured">
+- Vault gap for the keeper: <question or page to update | none>
 
 DECISIONS
 - <decision> - reason: <why>; alternatives rejected: <if material>.

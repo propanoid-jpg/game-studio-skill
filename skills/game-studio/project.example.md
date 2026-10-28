@@ -82,9 +82,27 @@ separate per-pipeline docs in the project. The general rules are the skill refer
 - Engine audio buses (`<engine_audio_buses>`): <bus names and loudness targets per bus — used by
   `audio-generation.md` post and `audio-design.md` mixing>
 
-## Knowledge base (optional)
+## Knowledge vault (Obsidian; mandatory when configured)
 
-<skill or vault name, lookup and update commands, page names for decision log and status>
+The vault method is `references/knowledge-vault.md` (absorbed llm-wiki method, no external
+plugin). Setup is run once by the `studio-setup-wiki` command (one-time sweep, then
+incremental sync); delete this section if the project has no vault, and do not work around
+a missing vault with ad-hoc docs.
+
+- Vault root (`<vault_root>`): <path, e.g. ~/ObsidianVault>   Wiki name (`<wiki_name>`):
+  <lowercase-kebab-case, e.g. the project name>
+- Vault path (`<wiki_root>`): <path, e.g. ~/ObsidianVault/03-Resources/<wiki_name> — outside
+  the repository unless named here explicitly>
+- Setup state (`<wiki_setup_state>`): <path, e.g. .claude/game-studio/wiki-setup.md>
+- Sweep scope (`<vault_scope>`): <docs/, project README, project.md, decision log, design docs>
+- Exclusions (`<vault_exclusions>`): <evidence/, generated output, secrets (.env, credentials,
+  keys, tokens), .git, dependencies, plugin skill files — never inventoried, copied or quoted>
+- qmd (`<vault_qmd>`): <off (default) / on if already installed — never installed by setup>
+- Git (`<vault_git>`): <commit only if already a repository (default) / never commit>
+- Lookup: read `<wiki_root>/wiki/index.md` first, then the relevant pages; cite the wiki page
+  and the repo source path. Update only via knowledge-keeper briefs; sync and lint with
+  `scripts/wiki-lint.py <wiki_root> --project-root <workspace_root>`.
+- Decision log / status page: <wiki page, e.g. [[decision-log]]>, or the queue doc if no vault
 
 ## Opt-in policies (delete what you do not want)
 

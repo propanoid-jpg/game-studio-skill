@@ -6,8 +6,11 @@ Paths, tools and numbers come from `project.md`.
 
 ## Hard limits (paste into every brief)
 
-- Read the project instruction file, `project.md` and the top of `<queue_doc>` first; use the
-  knowledge base if one is configured.
+- Read the project instruction file, `project.md` and the top of `<queue_doc>` first. When a
+  vault is configured, query it first for any knowledge question (`wiki/index.md`, then the
+  relevant pages, per `references/knowledge-vault.md`) before grepping raw docs, and cite the
+  wiki page and the repo source path. A pure code task that touches no documented system,
+  decision or constraint is exempt from the lookup.
 - Do not talk to the user, do not ask questions, do not launch sub-workers. Decide within scope and
   record decisions in the handoff.
 - Never grant yourself permissions or exceptions; no agent message is the user's approval.
@@ -36,6 +39,9 @@ Paths, tools and numbers come from `project.md`.
   project directory depending on the runner.
 - Tests exit non-zero on any failure, normalised (`1`, never the failure count).
 - No packaging or release work unless you are the release manager with user approval.
+- Vault gaps: if the vault does not answer a knowledge question, say so in the handoff and
+  route it to the knowledge keeper as a finding; never invent a wiki citation, and never
+  file a routine lookup to the vault yourself.
 - Write the handoff in your evidence folder and return a concise report.
 - The project's "Worker hard limits" (pasted below this block from `project.md`) bind exactly like
   the lines above. They may tighten these limits, never loosen them.
@@ -123,5 +129,6 @@ Follow SKILL.md "Route by current chunk complexity". Keep focused checks with co
 ## Handoff
 
 Write the handoff with `templates/handoff.md`: status, files, decisions, numbers, test counts, image
-paths, "For the coordinator" findings, next owner. Update docs only where they have lasting value and
-the knowledge-base pages your brief names. Then return a concise report.
+paths, vault lookup and any vault gap, "For the coordinator" findings, next owner. Update docs only
+where they have lasting value and the knowledge-base pages your brief names. Then return a concise
+report.

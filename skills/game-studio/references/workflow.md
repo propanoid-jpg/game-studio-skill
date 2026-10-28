@@ -87,7 +87,11 @@ output that has not been compared against them is a draft.
 ## 6. Docs and knowledge
 
 - Update the existing doc that owns the behaviour; do not create task reports. The handoff is the
-  delivery record; the coordinator records acceptance in the queue and knowledge base.
+  delivery record; the coordinator records acceptance in the queue and briefs a knowledge-keeper
+  vault update for any decision or system fact the handoff introduces.
+- When a vault is configured, query it first (index, then pages, per `knowledge-vault.md`)
+  before grepping raw docs for a knowledge question. Repo docs stay the authority, cited by
+  path with their hash; they are never copied into the vault's `raw/` folder.
 
 ## 7. Definition of done (worker)
 

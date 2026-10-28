@@ -22,6 +22,7 @@ something needs re-running, that is a follow-up brief.
 - [ ] Evidence folder within the disk budget and pruned (raw captures, old iterations, scratch and
       user-data dirs gone; handoff, criteria, references and boards kept).
 - [ ] Exclusive tools: only the named owner used its slot, within scope.
+- [ ] Vault query-first honoured: knowledge claims cite vault pages and source paths, or the handoff reports the vault gap; no invented wiki citation.
 
 ## Quality
 
@@ -40,7 +41,7 @@ something needs re-running, that is a follow-up brief.
 
 - [ ] Verdict: accept / accept with follow-ups / follow-up brief (same worker if running, else fresh).
 - [ ] `<queue_doc>`: targeted edit marking acceptance with date and handoff path, plus decisions.
-- [ ] Knowledge base (if configured): update owning pages and the decision log.
+- [ ] Vault (when configured): a knowledge-keeper update is briefed for any decision or system fact introduced, and a reported vault gap becomes a keeper task; decision log updated.
 - [ ] Each "For the coordinator" finding routed (S0 now; S1 next brief; S2/S3 polish list).
 - [ ] Finished worker cleaned up (shells, monitors, idle tools); next task(s) launched immediately;
       freed exclusive-tool slot refilled first; load and free disk checked.

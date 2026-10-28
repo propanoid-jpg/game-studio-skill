@@ -18,7 +18,7 @@ GOAL
 
 CONTEXT
 - User direction / queue lines: <quote or cite <queue_doc> section and date>
-- Knowledge-base pages to read first (if configured): <pages>
+- Vault lookup (mandatory when a vault is configured; a pure code task is exempt unless it touches a documented system): <wiki/index.md, then pages consulted, or "vault does not answer: <question>" as a keeper finding>
 - Docs and prior handoffs: <paths>
 - Recorded before-data to reuse (never rerun old builds): <paths>
 - Decisions already made by the coordinator: <list, with dates>
@@ -57,7 +57,7 @@ WORKER RULES (canonical: <skill_dir>/references/worker-rules.md; read it)
 HANDOFF
 - Write <evidence folder>/handoff.txt using <skill_dir>/templates/handoff.md.
 - Next owner after you: <e.g. integration worker runs sweeps X, Y>.
-- Update knowledge-base pages: <pages | "none; the coordinator will">.
+- Vault: <pages for a knowledge-keeper update brief | "none: no decision or system fact introduced">. Report any vault gap as a finding; never file a routine lookup to the vault yourself.
 - Return a concise report: status, files, decisions, numbers, test counts, image paths, findings.
 ```
 

@@ -34,7 +34,8 @@ clone (`~/.claude/plugins/marketplaces/game-studio/skills/game-studio/`), which
   `surveyor`, `coordinator-helper`, `asset-gen`, `audio-gen`) instead of a general-purpose agent. Each preloads this skill,
   carries the hard worker rules and has no Agent tool. A `model` passed at launch overrides its default.
 - Coordinator commands: `/game-studio:studio-brief`, `/game-studio:studio-review`,
-  `/game-studio:studio-pause`, `/game-studio:studio-resume`, `/game-studio:studio-setup-assets`.
+  `/game-studio:studio-pause`, `/game-studio:studio-resume`, `/game-studio:studio-setup-assets`,
+  `/game-studio:studio-setup-wiki`.
 - Plugin options (`/config`): `queue_doc` (default `docs/TODO.md`), `decision_log` (default
   empty), `evidence_dir` (default `evidence`), `engine_process` (default `godot`),
   `max_engine_runs` (default 10) and `enforce_delegation` (`warn` or `block`, default `warn`), read
@@ -62,6 +63,7 @@ clone (`~/.claude/plugins/marketplaces/game-studio/skills/game-studio/`), which
 | `references/skill-animation.md` | authoring, generating or reviewing skill animations and VFX; assigning visual identities |
 | `references/boss-encounters.md` | designing, implementing, tuning or retrofitting a boss fight |
 | `references/fun-profile.md` | setting or checking the Target Fun Profile; moment targets; playtests |
+| `references/knowledge-vault.md` | the Obsidian knowledge vault: query-first rule, sweep and sync, compile, lint |
 | `templates/*.md` | briefs, handoffs, handoff review |
 
 **Codex adapter.** For installation, native role discovery, fresh-worker launch requests and explicit
@@ -72,7 +74,10 @@ resource checks, read [references/codex.md](references/codex.md). In Codex, pref
 
 1. Read `project.md`, the project's instruction file and the task queue (`<queue_doc>`): pauses,
    urgent items, latest user directions.
-2. If a knowledge base is configured, query it before grepping raw docs.
+2. If a vault is configured, query it first (its `wiki/index.md`, then the relevant
+   pages) before grepping raw docs for any knowledge question; if no vault is
+   configured, the first task for knowledge work is `/game-studio:studio-setup-wiki`.
+   A pure code task that touches no documented system, decision or constraint is exempt.
 3. After a pause or crash, confirm the tree builds first (section 12).
 4. Check machine load and free disk before launching anything (section 6).
 
@@ -92,7 +97,7 @@ Full definitions in `references/roles.md`.
 | QA/test-health worker | Suite sweep (only when asked); fixes stale tests; routes bugs | parallel | mid |
 | Balance worker | Reusable probes; before/after tables | parallel | strongest |
 | Visual polish/review worker | Live-play readability against locked criteria | parallel | strongest |
-| Knowledge keeper | Knowledge-base sync and lint (if configured) | parallel | cheapest |
+| Knowledge keeper | Vault sync, compile and lint; owns the vault | parallel | cheapest |
 | Release manager | Packages a release, ONLY on explicit user approval | one | mid |
 | Surveyor | Read-only inventories, grep audits, log summaries | parallel | cheapest |
 | Coordinator helper (optional) | Drafts briefs, pre-reviews handoffs; never decides | parallel | mid |
@@ -182,7 +187,9 @@ corpus integration, or `model: "gpt-6-luna"` for an exact named-test run. Claude
 2. **Decide:** accept, accept with routed follow-ups, or send a follow-up brief (same worker if
    still running, else fresh). Never accept on a numeric pass alone.
 3. **Record:** mark the item in `<queue_doc>` with date and handoff path, plus decisions in the
-   decision log; knowledge-base updates go to a knowledge-keeper worker (batch them).
+   decision log; any decision or system fact the handoff introduces goes to a
+   knowledge-keeper worker for a vault update (pages, index, log) in the same loop, and a
+   vault gap the handoff reports becomes a keeper task, not a note.
 4. **Route findings:** urgent defects to the top of the queue and a brief now; the rest to the
    owner's next brief or a polish list.
 5. **Clean up:** stop the finished worker's background shells and monitors, and close idle tools it
@@ -276,7 +283,7 @@ The coordinator keeps `<queue_doc>` as the single queue: what runs, who owns it,
 
 ## 10. Development (detail in `references/workflow.md`)
 
-1. Read the queue and knowledge base; inspect current code, data and scenes.
+1. Read the queue and the vault (index first, then pages, when configured); inspect current code, data and scenes.
 2. Smallest coherent design; record assumptions.
 3. Order: data model and deterministic logic, test harness, integration, UI and feedback, tuning and art.
 4. **UI or graphics change:** capture current state, sketch before implementation, locked
@@ -310,7 +317,7 @@ triaged S0-S3; S0 (build break, crash, hang, data loss) goes to the top of the q
 
 **Pause:** tell running workers to stop at a building state and write a partial handoff (done,
 half-done, files touched, next step); add a `PAUSED <date>` block at the top of `<queue_doc>` with
-each in-flight stream's evidence folder as a checkpoint; update the knowledge base.
+each in-flight stream's evidence folder as a checkpoint; brief a knowledge-keeper vault update.
 
 **Resume:** have a worker verify the tree builds (one small suite, grep for errors); fix or route breaks; relaunch
 every paused stream as a **fresh** worker whose brief points at its checkpoint and warns edits may be
@@ -322,11 +329,22 @@ partial; clear each PAUSED line as it is relaunched or delivered.
 build never imply approval. The release manager runs the checklist and does no publishing,
 uploading or signing unless the user asks.
 
-## 14. Knowledge base (optional)
+## 14. Knowledge vault (mandatory when configured)
 
-If `project.md` configures one: look up before grepping docs; update after every accepted handoff and
-user decision or correction (a knowledge-keeper worker, briefed by the coordinator, batched); sync
-and lint periodically. Repository docs stay the raw sources, cited by path.
+The vault is the project's Obsidian knowledge base, built and maintained by the
+`knowledge-vault.md` method (absorbed llm-wiki method, no external plugin). When
+`project.md` configures one, every worker queries it first for knowledge questions
+(index, then pages, one level of wikilinks), cites the wiki page and the repo source
+path, and reports a vault gap as a keeper finding instead of working around it.
+After every accepted handoff and user decision or correction, the coordinator briefs a
+knowledge-keeper worker to update the vault (pages, index, log); sync (source-hash
+recompute, recompile only what drifted) and lint (`scripts/wiki-lint.py`) run at
+milestones and whenever drift is suspected. Repository docs stay the raw sources, cited
+by path with their hash; they are never copied into the vault's `raw/` folder. When no
+vault is configured, setup is run once with `/game-studio:studio-setup-wiki` (one-time
+sweep of all in-scope docs, then incremental sync), not re-run as a sweep afterwards.
+Routine worker lookups are never filed to the vault; only durable answers are filed by
+a keeper brief. Workers never delete a vault.
 
 ## 15. Writing a brief
 
