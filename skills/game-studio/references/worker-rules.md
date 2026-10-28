@@ -27,6 +27,9 @@ Paths, tools and numbers come from `project.md`.
   long batches; stop and report below `<min_free_disk>`.
 - Grep every run log for the engine's error markers before trusting a round.
 - Run only the tests your change needs. Never run a full sweep unless the brief says the user asked.
+- Generation batches are not test sweeps: a batch authorised in a brief (seed lists, variant
+  grids, per-line dialogue) is production work, bounded by `<batch_cap>` from `project.md` and
+  the single ComfyUI/GPU slot lease. ComfyUI jobs do not count against the engine-run caps above.
 - Never run old or frozen builds; use recorded before-data. No A/B builds for the user.
 - Never search the whole disk; search the workspace or your evidence folder only.
 - Use ABSOLUTE paths for user-data dirs and capture outputs; relative paths may resolve inside the
@@ -108,6 +111,10 @@ Several workers may edit one tree at once.
 - Promote an asset atomically: the exported file and its import metadata go into the runtime tree
   together, through the project's promotion tool if it has one, and are imported immediately. A
   half-promoted or un-imported asset voids other workers' rounds.
+- Generated assets promote atomically the same way, and their manifest travels with the asset
+  into the runtime tree: the manifest is the licence/provenance record (`licences.md`), and an
+  asset without one, or whose licence status is not `cleared` / `cleared-conditional`, is never
+  promoted.
 
 ## Model boundary
 

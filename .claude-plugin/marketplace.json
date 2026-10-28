@@ -9,8 +9,8 @@
     {
       "name": "game-studio",
       "source": "./",
-      "version": "1.3.0",
-      "description": "Studio roles as agents, brief/review/pause/resume commands and safety hooks for game projects.",
+      "version": "1.4.0",
+      "description": "Studio roles as agents, brief/review/pause/resume and asset-setup commands, local generation pipelines and design guides, and safety hooks for game projects.",
       "category": "development",
       "tags": [
         "gamedev",

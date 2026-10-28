@@ -21,6 +21,9 @@ approval. Commands, presets and output paths come from `project.md`.
 - [ ] Playthrough bots run on several seeds; results recorded honestly (not a human playthrough).
 - [ ] Save/data format stated: current version, whether a fresh profile is required.
 - [ ] Debug grants and debug-only UI are gated out of the export.
+- [ ] Licence manifest audit: every shipped generated asset has a manifest in the tree whose
+      licence status is `cleared` or `cleared-conditional` with its condition still holding
+      (`licences.md`); no `gated` or `prototype-only` generated asset is in the export.
 
 ## 2. Versioning
 

@@ -31,10 +31,10 @@ clone (`~/.claude/plugins/marketplaces/game-studio/skills/game-studio/`), which
   `agent` setting (see the plugin README).
 - In Claude, launch workers as the role agents `game-studio:<role>` (`feature-dev`, `ui-dev`, `art-owner`,
   `prep`, `integration`, `qa`, `balance`, `visual-review`, `knowledge-keeper`, `release-manager`,
-  `surveyor`, `coordinator-helper`) instead of a general-purpose agent. Each preloads this skill,
+  `surveyor`, `coordinator-helper`, `asset-gen`, `audio-gen`) instead of a general-purpose agent. Each preloads this skill,
   carries the hard worker rules and has no Agent tool. A `model` passed at launch overrides its default.
 - Coordinator commands: `/game-studio:studio-brief`, `/game-studio:studio-review`,
-  `/game-studio:studio-pause`, `/game-studio:studio-resume`.
+  `/game-studio:studio-pause`, `/game-studio:studio-resume`, `/game-studio:studio-setup-assets`.
 - Plugin options (`/config`): `queue_doc` (default `docs/TODO.md`), `decision_log` (default
   empty), `evidence_dir` (default `evidence`), `engine_process` (default `godot`),
   `max_engine_runs` (default 10) and `enforce_delegation` (`warn` or `block`, default `warn`), read
@@ -53,6 +53,15 @@ clone (`~/.claude/plugins/marketplaces/game-studio/skills/game-studio/`), which
 | `references/workflow.md` | planning or implementing a feature, UI/graphics or art change |
 | `references/qa.md` | testing, corpora, bots, balance tables, triage |
 | `references/release.md` | only after explicit user approval of a release |
+| `references/licences.md` | before installing, downloading or using any generation engine or model, and before promoting or shipping any generated asset |
+| `references/asset-pipeline.md` | planning or running any local generation: ComfyUI topology, the single GPU slot, MCP vs REST batch routes, manifest contract |
+| `references/image-and-textures.md` | generating sketches, concept art, seamless textures or PBR sets |
+| `references/models-3d.md` | generating or post-processing image-to-3D models |
+| `references/audio-generation.md` | generating music, SFX, ambience or voice; dialogue production; audio post |
+| `references/audio-design.md` | designing what audio the game needs: audit, coverage matrix, sonic identity, mixing targets |
+| `references/skill-animation.md` | authoring, generating or reviewing skill animations and VFX; assigning visual identities |
+| `references/boss-encounters.md` | designing, implementing, tuning or retrofitting a boss fight |
+| `references/fun-profile.md` | setting or checking the Target Fun Profile; moment targets; playtests |
 | `templates/*.md` | briefs, handoffs, handoff review |
 
 **Codex adapter.** For installation, native role discovery, fresh-worker launch requests and explicit
@@ -76,6 +85,8 @@ Full definitions in `references/roles.md`.
 | Coordinator | Main session (`coordinator` agent): plans, briefs, reviews, routes, decides, talks to the user; delegates all other work | one | main session |
 | Feature/system worker | Logic, tests, integration, UI for one scoped feature | parallel | mid |
 | Art owner | Models/rigs/exports/wires in one asset batch; owns an exclusive-tool slot | one per slot | strongest |
+| Asset generation worker | Images, textures/PBR and image-to-3D models via the local pipeline; post and manifest; owns the ComfyUI/GPU slot | one (single slot) | strongest |
+| Audio generation worker | Music, SFX, ambience and voice via the local pipeline; post and manifest; owns the ComfyUI/GPU slot | one (single slot) | strongest |
 | Prep worker | Sketches, criteria, specs, briefs so exclusive-tool owners never wait | parallel | mid |
 | Integration/validation worker | Seed sweeps, campaigns, comparison near-misses after a drop | parallel | mid |
 | QA/test-health worker | Suite sweep (only when asked); fixes stale tests; routes bugs | parallel | mid |
@@ -197,6 +208,12 @@ The coordinator keeps `<queue_doc>` as the single queue: what runs, who owns it,
   sketches, locked criteria, specs, capture cases) into prep workers.
 - The exclusive-tool owner's scope is narrow: build, export, wire in, one quick in-game check.
   Sweeps and repeated comparison rounds go to a parallel integration worker.
+- **The ComfyUI/GPU slot is different: exactly ONE slot.** Local generation (asset-gen and
+  audio-gen together) shares a single server and a single GPU, so it is one queue with one
+  owner at a time, not parallel instances like the DCC slots above. The coordinator leases
+  the slot to one generation brief at a time (named in the queue doc); inside that lease the
+  worker may run a batch up to `<batch_cap>`. Prep workers keep the generation queue fed
+  (concepts, locked criteria, line lists, job files) exactly as they feed DCC slots.
 - Everything else runs in parallel, bounded by section 6. Split by file ownership, not topic.
 
 ## 6. Resource limits (hard; numbers come from `project.md`)
@@ -213,6 +230,9 @@ The coordinator keeps `<queue_doc>` as the single queue: what runs, who owns it,
 - Every engine run under a timeout, with isolated user-data directories inside the task's evidence
   folder. Never touch a real player profile.
 - Windowed runs off-screen (not minimized), at most one per worker and `<total_windowed>` overall.
+- Engine-run caps do NOT count ComfyUI jobs. GPU generation jobs are bounded by the single
+  ComfyUI/GPU slot lease (section 5) plus `<batch_cap>` from `project.md`, not by
+  `<total_engine_runs>`.
 - Never kill processes you did not start; leave no windows or orphan runs behind.
 - Finished workers, background shells and idle tools do not linger.
 
@@ -236,6 +256,9 @@ The coordinator keeps `<queue_doc>` as the single queue: what runs, who owns it,
 - **Never run old or frozen builds** for comparison; reuse recorded before-data.
 - **Lean workflow:** no provenance manifests, hash files, task reports or one-off scripts; scripts
   must be reusable; docs only where they have lasting value (update existing ones).
+  **Exception:** generated assets carry a mandatory manifest per asset folder — it is a
+  licence/provenance record (prompt, seed, model, licence status), required by
+  `references/asset-pipeline.md` and `references/licences.md`, not a task report.
 - **Player-facing wording** is direct and non-chatty. Use one message system, not parallel ones.
 - Optional policies, active only if `project.md` opts in: **pre-release** (no back-compat
   migrations, adapters or legacy tests; reject incompatible data clearly), **performance last**
@@ -261,7 +284,8 @@ The coordinator keeps `<queue_doc>` as the single queue: what runs, who owns it,
    implement, compare into a new iteration folder, iterate. Never loosen thresholds or mask regions.
    Always review the actual images.
 5. **Art:** promote an exported asset and its import metadata together and import at once; a
-   half-promoted asset voids other workers' rounds.
+   half-promoted asset voids other workers' rounds. A generated asset promotes the same way,
+   with its manifest travelling with it (section 8 exception).
 6. Run targeted tests and a build/parse check; write the handoff.
 
 ## 11. QA (detail in `references/qa.md`)
@@ -274,6 +298,10 @@ The coordinator keeps `<queue_doc>` as the single queue: what runs, who owns it,
 | Full test-health sweep | ONLY when the user explicitly asks | QA worker |
 | Live-play readability review | after visual/UI milestones | visual polish worker |
 | Balance tables | any tuning change | balance worker |
+| Generated-asset acceptance | any generated asset before promotion | asset-gen / audio-gen, coordinator promotes |
+| Audio-design acceptance | audio coverage, mixing and identity milestones | audio-gen + visual polish worker |
+| Boss / skill-animation acceptance | boss retrofit or new skill VFX | feature/balance worker, visual polish worker |
+| Fun-profile playtest | profile or moment-target milestones | visual polish / balance worker |
 
 Tests are deterministic (fixed seeds, fixed timestep, simulation time not wall clock). Findings are
 triaged S0-S3; S0 (build break, crash, hang, data loss) goes to the top of the queue with a worker now.

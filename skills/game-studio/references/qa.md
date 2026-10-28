@@ -62,6 +62,28 @@ caps in `worker-rules.md`. Commands come from `project.md`.
   from running an old build**.
 - Output: before/after tables per level and encounter type, plus the data diff.
 
+## Layer 7: generated-asset acceptance
+
+- Owner: asset-gen / audio-gen for production, coordinator for promotion. Trigger: any generated
+  batch, before promotion.
+- Licence first: every asset's manifest records a licence status, and only `cleared` or
+  `cleared-conditional` (condition still holding) assets may be promoted. `gated` assets wait
+  for the user's gate; `prototype-only` assets never ship — they are contained in
+  `<generated_dir>`, flagged, and replaced by a cleared pipeline before release.
+- Pipeline verification passed (tiling/render check for visuals, post and listening check for
+  audio) and the locked prep criteria pass, judged as a player, not by metrics alone.
+
+## Layer 8: design-guide acceptance tests
+
+- Owner: the implementing worker (feature/balance for bosses, feature/visual polish for skill
+  animation, visual polish/balance for fun-profile playtests). Trigger: a boss retrofit, a new
+  or reworked skill effect, a fun-profile milestone.
+- Run the acceptance tests of the relevant reference as targeted tests: the boss stand-still,
+  ignore-the-adds, coverage-matrix and build-matrix tests (`boss-encounters.md`); the skill
+  identity and distance tests (`skill-animation.md`); the audio coverage and acceptance tests
+  (`audio-design.md`); the segmented playtest protocol (`fun-profile.md`). These are targeted
+  suites for the change, never a full test-health sweep (Layer 4 still needs the user's ask).
+
 ## Severity triage and routing
 
 | Severity | Examples | Action |

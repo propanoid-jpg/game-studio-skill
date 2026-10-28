@@ -12,7 +12,7 @@ Requires Python 3.11+ and a persistent plugin clone. Run from that clone:
 python scripts/codex_adapter.py install --project /absolute/path/to/game
 ```
 
-This installs 12 standalone role files into the project's .codex/agents/, skill pointers into
+This installs 14 standalone role files into the project's .codex/agents/, skill pointers into
 .agents/skills/, and a managed coordinator block in AGENTS.md. Existing unrelated instructions
 are preserved; unmanaged destination collisions fail before writing. Re-running updates adapter
 files and its block. The installer does not edit global Codex configuration or permissions.
@@ -25,7 +25,9 @@ file is reused instead. Read paths in this order: .codex/game-studio/project.md,
 locations, numeric caps and worker hard limits configured before starting work.
 
 Restart Codex and confirm discovery of game-studio-feature-dev, game-studio-surveyor and the
-other roles. Standalone .codex/agents/*.toml is the current documented format. Older clients
+other roles. The two generation roles (`asset-gen`, `audio-gen`) install the same way; in Codex
+they hold the ComfyUI/GPU slot with an adapter lease (resource name from `project.md`) and use
+the MCP route or the REST batch script with whatever tools the runtime exposes. Standalone .codex/agents/*.toml is the current documented format. Older clients
 may need an update; do not silently claim that native roles loaded. See
 https://learn.chatgpt.com/docs/agent-configuration/subagents for current discovery and controls.
 

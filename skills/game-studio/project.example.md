@@ -42,10 +42,45 @@ the main session writes other files. Keep them equal to the values below.
 | Tool | Slots | Address per slot | Launch / health check | Close rule |
 |---|---|---|---|---|
 | <e.g. art app> | <N, e.g. 4 parallel instances> | <ports/profiles> | <commands> | <save check first> |
+| ComfyUI / GPU | 1 (always exactly one) | <comfyui_url> | <health check command> | <one queue, one owner; lease named in queue doc> |
 
 Shared single-owner sources: <files>
 
 Art-tool MCP server name (for the `art-owner` agent's tools; default `blender`): <name>
+
+## Asset pipelines (local generation; delete if the project does not generate)
+
+Pipeline operating specifics live HERE, in `project.md` (the one-copy rule): do NOT create
+separate per-pipeline docs in the project. The general rules are the skill references
+`asset-pipeline.md`, `image-and-textures.md`, `models-3d.md`, `audio-generation.md` and
+`licences.md`; setup is run by the `studio-setup-assets` command and its state file.
+
+- GPU (`<gpu>` / `<gpu_vram>`): <e.g. model, VRAM GB>   RAM: <GB>
+- ComfyUI server (`<comfyui_url>`): <http://127.0.0.1:8188 — localhost only, never exposed>
+  Install root (`<comfyui_root>`): <path>   MCP server name (`<comfyui_mcp_server>`): <name>
+- Model roots: <checkpoints / diffusion models / LoRA / VAE / audio model paths>
+- Generated output (`<generated_dir>`): <path, e.g. art/generated/> — one folder per asset,
+  each with its `manifest.json`
+- Batch cap (`<batch_cap>`): <max jobs in one authorised generation batch, e.g. 32>
+  Download budget (`<download_budget>`): <max GB for model downloads without asking again>
+- Access routes: MCP for interactive work; a reusable REST batch script for batch work
+  (both equal standing, chosen per task — see `asset-pipeline.md`)
+- Licence policy: follow `references/licences.md`. Per-engine status recorded here:
+  <engine/model — status `cleared` / `cleared-conditional` (condition) / `gated` / `prototype-only`, date>
+  Gated engines awaiting the user's personal licence acceptance: <list or none>
+- Cloud generation APIs: <off (default) / on for: ...> — no cloud image or audio APIs and no
+  paid partner nodes unless the user approves in that specific turn.
+- Model storage lives OUTSIDE the evidence budget: model files sit under `<comfyui_root>` and
+  are not counted against `<evidence_budget>`; generated outputs and evidence still are.
+
+## Design parameters (used by the design-guide references)
+
+- Combat model (`<combat_model>`): <e.g. cooldowns / mana with no cooldowns / stamina — drives
+  the repetition rules in `skill-animation.md` and the resource pressure in `boss-encounters.md`>
+- Camera modes (`<camera_modes>`): <e.g. third person only / first + third person — every skill
+  effect is authored per mode in `skill-animation.md`>
+- Engine audio buses (`<engine_audio_buses>`): <bus names and loudness targets per bus — used by
+  `audio-generation.md` post and `audio-design.md` mixing>
 
 ## Knowledge base (optional)
 

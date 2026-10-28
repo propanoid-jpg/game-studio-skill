@@ -66,6 +66,17 @@ obsolete compatibility paths in the system you change (not unrelated ones).
 6. **Coordinator promotion:** run the project's acceptance checklist; record accepted or
    needs-iteration with reasons.
 
+**Generation branch** (local pipelines; replaces steps 2–3 for generated batches, then joins
+at step 4): the prep worker's locked criteria gate generated output exactly like sketches —
+output that has not been compared against them is a draft.
+
+1. **Prep worker:** as step 1, plus the generation inputs (prompts or line lists, references,
+   job file for batch work).
+2. **Asset-gen / audio-gen (the single ComfyUI/GPU slot):** licence gate (`licences.md`), then
+   generate via the MCP route or the reusable REST batch script; run the pipeline post contract
+   and verification; deliver into `<generated_dir>` with the manifest.
+3. **Promote and wire in:** as step 4 — asset and manifest together, imported at once.
+
 ## 5. Procedural generation work
 
 - Seeds, layout, validation and scene instantiation stay separate and testable without rendering.

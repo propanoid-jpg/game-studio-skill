@@ -49,7 +49,7 @@ unless the user asked. Hand off COMPLETE, or BLOCKED with the owner of each bloc
 - UI or graphics changes: capture the current state, sketch BEFORE implementing, lock discriminating
   named-region criteria at several resolutions (the before state must fail them), compare each
   iteration into a new folder, never loosen thresholds or mask regions, and review the actual images.
-- Lean workflow: no provenance manifests, hash files, task-report docs or one-off scripts; update
+- Lean workflow: no provenance manifests (exception: the mandatory generated-asset licence manifest, see asset-pipeline.md), hash files, task-report docs or one-off scripts; update
   existing docs only where they have lasting value. No packaging or release work unless you are the
   release manager with recorded user approval.
 - Put scratch and evidence in your evidence folder (`<evidence_dir>/<stream>/<task>/`, from project.md or the plugin option `evidence_dir`),

@@ -21,13 +21,13 @@ class AdapterTests(unittest.TestCase):
     def test_install_preserves_instructions_and_is_idempotent(self):
         agents = self.project / "AGENTS.md"
         agents.write_text("User's durable instructions.\n", encoding="utf-8")
-        self.assertEqual(a.install(self.project)["workers"], 12)
+        self.assertEqual(a.install(self.project)["workers"], 14)
         first = agents.read_text(encoding="utf-8")
         a.install(self.project)
         self.assertEqual(agents.read_text(encoding="utf-8"), first)
         self.assertTrue(first.startswith("User's durable instructions.\n"))
         profiles = list((self.project / ".codex/agents").glob("*.toml"))
-        self.assertEqual(len(profiles), 12)
+        self.assertEqual(len(profiles), 14)
         for path in profiles:
             profile = tomllib.loads(path.read_text(encoding="utf-8"))
             self.assertTrue(profile["name"].startswith("game-studio-"))
@@ -35,7 +35,7 @@ class AdapterTests(unittest.TestCase):
             self.assertIn(str(a.ROOT), profile["developer_instructions"])
         surveyor = tomllib.loads((self.project / ".codex/agents/game-studio-surveyor.toml").read_text(encoding="utf-8"))
         self.assertEqual(surveyor["sandbox_mode"], "read-only")
-        self.assertEqual(len(list((self.project / ".agents/skills").glob("*/SKILL.md"))), 5)
+        self.assertEqual(len(list((self.project / ".agents/skills").glob("*/SKILL.md"))), 6)
 
     def test_collision_does_not_partially_install(self):
         path = self.project / ".codex/agents/game-studio-qa.toml"
@@ -101,7 +101,7 @@ class AdapterTests(unittest.TestCase):
     def test_release_versions_match(self):
         plugin = json.loads(a.read(a.ROOT / ".claude-plugin/plugin.json"))
         market = json.loads(a.read(a.ROOT / ".claude-plugin/marketplace.json"))
-        self.assertEqual(plugin["version"], "1.3.0")
+        self.assertEqual(plugin["version"], "1.4.0")
         self.assertEqual(market["plugins"][0]["version"], plugin["version"])
 
 

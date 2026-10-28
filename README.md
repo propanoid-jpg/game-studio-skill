@@ -10,6 +10,13 @@ into a small game studio. It is engine- and art-pipeline-agnostic. It bundles:
   coordinator review loop, parallelism caps and exclusive-tool slots (for example several art-app
   instances, one owner per instance and file), shared-tree hygiene, development, QA (layers, triage
   S0-S3), visual and release workflows, pause/resume;
+- **local generation pipelines**: one ComfyUI/GPU slot for images, seamless textures and PBR sets,
+  image-to-3D models, and music, SFX, ambience and voice — driven interactively over MCP or in
+  batches by a reusable REST script, with a licence gate before any download or generation and a
+  licence/provenance manifest travelling with every generated asset;
+- **design guides** as skill references: audio design (audit, coverage matrix, nine-slot skill
+  anatomy), skill animation and VFX identity (fingerprints and the distance rule), boss encounters
+  (movement portfolio, attack coverage, adds law) and the fun profile (moment targets, playtests);
 - **role agents**, so workers launch as named studio roles instead of a general-purpose agent;
 - **coordinator commands** for briefs, reviews, pause and resume;
 - **hooks** (delegation check, engine-run cap warning, review reminder, session-start pointer);
@@ -58,7 +65,7 @@ From a persistent clone of this repository (Python 3.11+):
 python scripts/codex_adapter.py install --project /absolute/path/to/game
 ```
 
-This installs 12 native Codex worker roles, discoverable skill pointers and coordinator instructions
+This installs 14 native Codex worker roles, discoverable skill pointers and coordinator instructions
 into the target project. Fill the generated studio project file, restart Codex, and verify role
 discovery. Re-run installation after updating or moving the clone. Existing project instructions
 are preserved; global Codex settings and permissions are not changed.
@@ -78,6 +85,7 @@ skills/studio-brief/              /game-studio:studio-brief <role> <task>
 skills/studio-review/             /game-studio:studio-review <handoff>
 skills/studio-pause/              /game-studio:studio-pause [reason]
 skills/studio-resume/             /game-studio:studio-resume [stream ...]
+skills/studio-setup-assets/       /game-studio:studio-setup-assets — gated, resumable local pipeline setup
 agents/                           the coordinator and one agent per studio role
 settings.json                     runs the main session as game-studio:coordinator
 hooks/hooks.json, scripts/        hooks
@@ -140,6 +148,8 @@ role agents in Codex. Never pass `haiku`, `sonnet` or `opus` as a Codex model.
 | `feature-dev` | One scoped feature or system change | sonnet (pass opus for unknown-cause debugging) |
 | `ui-dev` | Interface change against a sketch and locked criteria | sonnet |
 | `art-owner` | Live art-tool work on one exclusive slot; several may run in parallel | opus |
+| `asset-gen` | Image, texture/PBR and 3D generation on the single ComfyUI/GPU slot | opus |
+| `audio-gen` | Music, SFX, ambience and voice generation on the single ComfyUI/GPU slot | opus |
 | `prep` | Captures, sketches, locked criteria, specs so exclusive tools never wait | sonnet |
 | `integration` | Seed sweeps, fallbacks, campaigns, comparison near-misses | sonnet |
 | `qa` | Test sweeps (only when the user asks), stale and flaky tests | sonnet |
@@ -208,7 +218,8 @@ Set when the plugin is enabled, or later in `/config`:
    `claude plugin marketplace update game-studio` keeps current.
 5. The `art-owner` agent grants `mcp__blender__*`. For another art tool or server name, copy
    `agents/art-owner.md` into `<project>/.claude/agents/`, give it a new `name`, and edit `tools`.
-   Any other role can be overridden the same way.
+   Any other role can be overridden the same way. The generation agents (`asset-gen`, `audio-gen`)
+   grant `mcp__comfyui__*` the same way; the server name is set in `project.md`.
 
 ## Example
 
@@ -220,6 +231,19 @@ ownership, writes one brief per task with `/game-studio:studio-brief`, launches 
 before recording acceptance and launching the next task.
 
 ## Changelog
+
+- **1.4.0**
+  - Local generation pipelines: ComfyUI topology with a single GPU slot, MCP and reusable REST
+    batch routes, licence gating (`licences.md`) and a mandatory per-asset manifest; references
+    for image/textures, 3D models and audio generation, plus the gated, resumable
+    `studio-setup-assets` setup command and templates for manifests and audits.
+  - Two new worker roles, `asset-gen` and `audio-gen` (14 Codex worker roles in total).
+  - Design guides as references: audio design, skill animation identity, boss encounters and
+    the fun profile, wired into the QA layers, the art workflow and release readiness
+    (licence manifest audit).
+  - Contradiction fixes: the lean-workflow ban on provenance manifests now excepts the
+    generated-asset manifest; authorised generation batches are production work, not test
+    sweeps; ComfyUI jobs are bounded by the slot lease and `<batch_cap>`, not engine-run caps.
 
 - **1.3.0**
   - Codex project adapter: 12 native worker roles, skill discovery and coordinator activation.
