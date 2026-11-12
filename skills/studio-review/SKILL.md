@@ -19,10 +19,11 @@ Follows section 4 of the `game-studio` skill (`${CLAUDE_PLUGIN_ROOT}/skills/game
    - judge art and UI as a player; a numeric pass alone never accepts.
 3. Verdict: accept, accept with routed follow-ups, or a follow-up brief (same worker if it is still
    running, otherwise a fresh one; reassess remaining chunk complexity and cite a concrete reason for any escalation).
-   Once complex design is settled, route repeated validation to fresh Sol/sonnet; fixed named runs may use Luna/haiku. Preserve focused implementation checks and one quick gameplay review.
-4. Record the verdict in the queue doc with the date and handoff path, and decisions in the decision
-   log; brief a knowledge-keeper worker for knowledge-base updates if one is configured. Route each "For the coordinator" finding (S0 now, S1 next brief, S2/S3 polish list).
-5. Clean up the worker's background shells and monitors, then launch the next task immediately,
-   refilling a freed exclusive-tool slot first.
+   Once complex design is settled, route repeated validation to a fresh mid-tier worker; fixed named runs may use the cheapest. Preserve focused implementation checks and one quick gameplay review.
+4. Delete the accepted item from the queue doc (open work only) and add follow-ups as one line each;
+   record decisions in the decision log; brief a knowledge-keeper worker for knowledge-base updates if one is configured. Route each "For the coordinator" finding (S0 now, S1 next brief, S2/S3 polish list).
+5. Clean up the worker's background shells and monitors, then fill every free slot with independent
+   queue items, refilling a freed exclusive-tool slot first. Check the other running workers for
+   stalls (no new evidence for `<stall_minutes>`) and relaunch any that are stuck.
 
 Reply with a short verdict: status, what was checked, decisions, routed findings, next launch.

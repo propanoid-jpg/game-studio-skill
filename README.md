@@ -116,6 +116,20 @@ Put it in `~/.claude/settings.json` to opt out everywhere, or start one session 
 `claude --agent claude`. The delegation hook still warns in such a session; set
 `enforce_delegation` to `warn` (the default) or disable the plugin if you do not want that either.
 
+**Main session model.** Run the coordinator on the strongest tier (`opus` in Claude, Sol in
+Codex). Its briefs and reviews set the ceiling for every worker, so the mid tier is a false
+saving; the top tier is wasted on its many routine turns (accept, record, launch). For the rare
+hard management problem (scoping a release, splitting a large goal, a stream that keeps failing
+review) the coordinator briefs a top-tier worker to write the plan and then executes it.
+
+**Sessions.** Use one main session per goal or release. All state lives in files (the queue doc,
+the decision log, `project.md`, handoffs, the coordinator's memory), so a fresh session loses
+nothing, while a long one re-reads its whole history on every turn and drifts after
+compactions. At a goal boundary, or once a session has been compacted, let the running workers
+return (or run `/game-studio:studio-pause`), start a new session and run
+`/game-studio:studio-resume`. The session-start hook reminds the coordinator of this after each
+compaction.
+
 ### Agents
 
 Launch workers with the Agent tool as `subagent_type: "game-studio:<agent>"` (or mention
@@ -125,7 +139,7 @@ start, keep the shared tree parseable, judge like a player, sketch-first visual 
 handoff, never talks to the user and has no Agent tool, so it cannot launch sub-agents. A `model`
 passed at launch overrides the default below.
 
-Role defaults are hints: route each current chunk by complexity. Once complex design is settled, repeated validation moves to a fresh Sol/sonnet chunk; fixed named-test runs may use Luna/haiku. See the skill routing policy.
+Role defaults are hints: route each current chunk by complexity. Once complex design is settled, repeated validation moves to a fresh mid-tier chunk; fixed named-test runs may use the cheapest. The top tier (`fable` in Claude) is for the hardest chunks only. See the skill routing policy.
 
 ### Runtime model mapping
 
@@ -134,8 +148,9 @@ Choose the launch API and model for the active runtime. Keep the coordinator on 
 | Task tier | Codex model | Claude model |
 |---|---|---|
 | Light / cheapest | `gpt-6-luna` | `haiku` |
-| Medium / mid | `gpt-6.1-sol` | `sonnet` |
-| Complex / strongest | `gpt-6-astra` | `opus` |
+| Medium / mid | `gpt-5.6-terra` | `sonnet` |
+| Complex / strongest | `gpt-6.1-sol` | `opus` |
+| Hardest / top | `gpt-6-astra` | `fable` |
 
 In Claude, launch `game-studio:<role>` with the Agent tool and pass the Claude model. The `model`
 frontmatter in `agents/*.md` is Claude-specific. In Codex, use `collaboration.spawn_agent` with
@@ -180,9 +195,11 @@ Hooks are advisory and never block, except the delegation check when `enforce_de
   (`tasklist` on Windows, `pgrep` on macOS/Linux) and warns when the count reaches
   `max_engine_runs`. An empty process name or a cap of 0 turns it off.
 - **PostToolUse (Agent):** after the coordinator launches a `game-studio:*` or general-purpose
-  worker, reminds it to review the handoff with the checklist when the worker returns and to clean
-  up the worker's shells. (A SubagentStop hook is deliberately not used: its context goes to the
-  finishing worker, not to the coordinator, and makes the worker take another turn.)
+  worker, reminds it to fill the remaining free slots with independent queue items.
+- **UserPromptSubmit:** when a background worker reports back to the main session, reminds the
+  coordinator to review the handoff with the checklist, clean up, refill every free slot and
+  relaunch stalled workers. Silent on typed prompts and outside studio projects. (A SubagentStop
+  hook is deliberately not used: its context goes to the finishing worker.)
 - **SessionStart:** if the project has `.claude/game-studio/project.md` (or
   `.claude/skills/game-studio/project.md`) or the queue doc, adds a one-line reminder to read them.
   Silent in other projects.
@@ -233,6 +250,21 @@ ownership, writes one brief per task with `/game-studio:studio-brief`, launches 
 before recording acceptance and launching the next task.
 
 ## Changelog
+
+- **1.6.0** (fixes from a month of real studio sessions)
+  - Codex tiers are now Luna, Terra, Sol, Astra (cheapest to top); Sol and Astra each moved up one tier.
+  - Top model tier: `fable` in Claude and `gpt-6-astra` in Codex, for the hardest chunks only (a documented strongest-tier
+    failure, or foundational design many workers build on). No role defaults to it.
+  - Claude-facing text names tiers, not Codex models; the coordinator prompt no longer opens with
+    Codex instructions.
+  - Engine-cap hook counts one Windows engine run once (skips the `_console` launcher).
+  - Queue starvation and stalls: new worker-return hook (review, refill every free slot, stall
+    check), launch-time reminder to fill remaining slots, `<stall_minutes>` in `project.md`.
+  - Worker rules: stop only recorded process IDs, own runs until they exit, wait without polling,
+    start the handoff early, "all" means all with exclusions listed.
+  - The queue doc holds open work only: accepted items are deleted, not annotated.
+  - Main-session guidance: strongest tier for the coordinator, one session per goal, and a
+    reminder after each compaction to move to a fresh session at the next quiet point.
 
 - **1.5.0**
   - Knowledge vault: absorbed llm-wiki method (MIT, attributed) as `references/knowledge-vault.md`

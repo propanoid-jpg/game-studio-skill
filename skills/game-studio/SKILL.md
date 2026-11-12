@@ -41,7 +41,8 @@ clone (`~/.claude/plugins/marketplaces/game-studio/skills/game-studio/`), which
   `max_engine_runs` (default 10) and `enforce_delegation` (`warn` or `block`, default `warn`), read
   by the hooks. `project.md` is the source of truth; keep the options equal to it.
 - Hooks: a warning before shell commands when the engine-process count reaches the cap, a
-  review-and-clean-up reminder after each worker launch, a session-start pointer to `project.md`
+  fill-the-free-slots reminder after each worker launch, a review, refill and stall-check
+  reminder when a worker reports back, a session-start pointer to `project.md`
   and the queue doc, and a delegation check that warns when the main session (never a worker)
   writes any other file or calls a write-like MCP tool. Only the delegation check can block, and
   only with `enforce_delegation: block`.
@@ -111,8 +112,12 @@ Choose the launch API and model for the active runtime. Keep the coordinator on 
 | Task tier | Codex model | Claude model |
 |---|---|---|
 | Light / cheapest | `gpt-6-luna` | `haiku` |
-| Medium / mid | `gpt-6.1-sol` | `sonnet` |
-| Complex / strongest | `gpt-6-astra` | `opus` |
+| Medium / mid | `gpt-5.6-terra` | `sonnet` |
+| Complex / strongest | `gpt-6.1-sol` | `opus` |
+| Hardest / top | `gpt-6-astra` | `fable` |
+
+Name models by the active runtime only: in Claude, briefs, the queue doc and replies say
+`haiku`/`sonnet`/`opus`/`fable`, never the Codex names, and the reverse in Codex.
 
 In Claude, launch `game-studio:<role>` with the Agent tool and pass the Claude model. The `model`
 frontmatter in `agents/*.md` is Claude-specific. In Codex, use `collaboration.spawn_agent` with
@@ -120,7 +125,7 @@ frontmatter in `agents/*.md` is Claude-specific. In Codex, use `collaboration.sp
 when overriding the model; `"all"` full-history forks inherit the
 coordinator's model. Codex does not accept `subagent_type` or Claude role-agent identifiers.
 Read the relevant role instructions into the brief; a Claude plugin installation does not register
-role agents in Codex. Never pass `haiku`, `sonnet` or `opus` as a Codex model.
+role agents in Codex. Never pass `haiku`, `sonnet`, `opus` or `fable` as a Codex model.
 
 ### Model choice
 
@@ -132,6 +137,7 @@ failed review, not by default.
 | cheapest | Mechanical, fully specified work: surveys, inventories, grep audits, renames, running a named test list, small doc edits. |
 | mid | Scoped workers with a clear brief: stale tests, one feature or bug with a known cause, UI against locked sketches, prep captures, sweeps, packaging. |
 | strongest | Judgement-heavy work: live art modelling and review, readability reviews, unknown-cause debugging, balance design, cross-system changes, design trade-offs. |
+| top | The hardest chunks only, never a role default: a root cause or design a strongest-tier worker failed on (documented gap); architecture or core-system design that many workers will build on (save or data model, generation core, balance model or simulator); a diagnosis spanning several systems with no reproduction. Hand implementation and validation back down once the design or root cause is settled. |
 
 The model never changes the rules. If a cheaper worker's handoff fails review, reassess the remaining chunk and relaunch a fresh worker with a concrete complexity/failure reason for any escalation. A fork inherits the coordinator's model; use a
 fresh worker when a cheaper one is wanted.
@@ -139,15 +145,18 @@ fresh worker when a cheaper one is wanted.
 ### Route by current chunk complexity
 
 Choose the model for the current chunk, not the role title or its previous model. Role defaults
-are starting hints only; pass the runtime-valid model on every launch. Use Astra/opus for creative
+are starting hints only; pass the runtime-valid model on every launch. Use the strongest tier for creative
 modelling, visual judgement, unknown-cause or cross-system complex diagnosis and balance design;
-Sol/sonnet for scoped known-cause fixes, known-criteria integration/validation, medium preparation
-and test-health triage; Luna/haiku for fixed named-test runs, log/status/inventory audits and
-mechanical edits. Coordinator helpers normally use Sol/sonnet; visual judgement may need Astra/opus.
+mid for scoped known-cause fixes, known-criteria integration/validation, medium preparation
+and test-health triage; cheapest for fixed named-test runs, log/status/inventory audits and
+mechanical edits. Coordinator helpers normally use mid; visual judgement may need the strongest.
+The top tier is the last step of the ladder (mid, strongest, top): use it when a strongest-tier
+handoff documents a gap it could not close, or for a foundational design named in "Model choice".
+One top-tier worker settles the design or root cause and writes it down; cheaper workers build it.
 
-An Astra/opus implementer may perform focused checks needed to implement the change and one quick
+A strongest-tier implementer may perform focused checks needed to implement the change and one quick
 final gameplay review. Once design/root cause is settled, hand repeated corpus, suite and routine
-validation to a fresh Sol/sonnet integration or QA chunk; fixed isolated runs may use Luna/haiku.
+validation to a fresh mid-tier integration or QA chunk; fixed isolated runs may use the cheapest.
 Name the exact remaining checks, criteria, files, evidence and next model in the handoff. Keep
 coupled complex implementation together: do not delegate every command or switch models mid-chunk.
 Escalate only for concrete complexity or a documented failure/root-cause gap, not merely because
@@ -155,9 +164,9 @@ an ordinary test failed. Workers report the gap; the coordinator briefs a fresh 
 ownership, resource, visual and approval rules. Full sweeps still require the user's request.
 
 Codex fresh launch examples: `collaboration.spawn_agent` with `fork_turns: "none"`, a self-contained
-role brief, and `model: "gpt-6-astra"` for unknown-cause diagnosis, `model: "gpt-6.1-sol"` for settled
+role brief, and `model: "gpt-6-astra"` for a hardest chunk, `model: "gpt-6.1-sol"` for unknown-cause diagnosis, `model: "gpt-5.6-terra"` for settled
 corpus integration, or `model: "gpt-6-luna"` for an exact named-test run. Claude uses the equivalent
-`opus`/`sonnet`/`haiku` override on its Agent tool. Keep the coordinator's current model.
+`fable`/`opus`/`sonnet`/`haiku` override on its Agent tool. Keep the coordinator's current model.
 
 ## 3. Interaction rules
 
@@ -178,7 +187,9 @@ corpus integration, or `model: "gpt-6-luna"` for an exact named-test run. Claude
   itself or another agent permissions, settings or exceptions the user did not grant.
 - **One handoff per task**: `<evidence_dir>/<stream>/<task>/handoff.txt` (template in
   `templates/handoff.md`) plus a concise final report.
-- **Stalled worker:** relaunch fresh from its checkpoint; do not nurse it.
+- **Stalled worker:** a worker with no new output in its evidence folder for `<stall_minutes>`
+  is stalled: stop it and relaunch fresh from its checkpoint; do not nurse it or wait for the user
+  to notice.
 
 ## 4. The coordinator loop (every handoff)
 
@@ -186,7 +197,8 @@ corpus integration, or `model: "gpt-6-luna"` for an exact named-test run. Claude
    logs, grep logs for errors, confirm scope was respected and nothing was loosened.
 2. **Decide:** accept, accept with routed follow-ups, or send a follow-up brief (same worker if
    still running, else fresh). Never accept on a numeric pass alone.
-3. **Record:** mark the item in `<queue_doc>` with date and handoff path, plus decisions in the
+3. **Record:** delete the accepted item from `<queue_doc>` (the queue holds open work only, one
+   line per item; the handoff is the record) and add its follow-ups as new lines; decisions go in the
    decision log; any decision or system fact the handoff introduces goes to a
    knowledge-keeper worker for a vault update (pages, index, log) in the same loop, and a
    vault gap the handoff reports becomes a keeper task, not a note.
@@ -195,8 +207,9 @@ corpus integration, or `model: "gpt-6-luna"` for an exact named-test run. Claude
 5. **Clean up:** stop the finished worker's background shells and monitors, and close idle tools it
    launched (after checking there is no unsaved work). Never close what you did not start. Confirm
    the worker pruned its evidence folder to the disk budget.
-6. **Launch the next task(s) immediately**, keeping useful workers busy within the caps. Refill a
-   freed exclusive-tool slot first.
+6. **Fill every free slot now**, not just one: launch all queue items that do not depend on a
+   running worker, up to the caps (not while paused or when the user said to hold launches). Refill a freed exclusive-tool slot first. A task waiting for
+   a busy tool or slot never holds back the other launches.
 
 The coordinator keeps `<queue_doc>` as the single queue: what runs, who owns it, where evidence is.
 
@@ -252,7 +265,7 @@ The coordinator keeps `<queue_doc>` as the single queue: what runs, who owns it,
   and judge results yourself.
 - Workers decide within scope and record material decisions with reasons. Anything touching another
   owner's contract, a protected decision or a locked criterion is a finding.
-- Tooling setup is done by the studio, not handed to the user.
+- Tooling setup, and restarting a hung tool or server, is done by the studio, not handed to the user.
 
 ## 8. Standing rules (apply to every brief)
 

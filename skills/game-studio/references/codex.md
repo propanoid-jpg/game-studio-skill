@@ -49,8 +49,8 @@ The result is JSON for collaboration.spawn_agent: task_name, fork_turns="none", 
 The message embeds role instructions, canonical worker rules, project settings and the task brief.
 The adapter prints a request; the coordinator invokes the available spawn tool. It does not create
 agents through a shell or send messages by itself. Only "none" and "all" are supported fork modes
-in this collaboration API. Choose light (gpt-6-luna), medium (gpt-6.1-sol), or complex
-(gpt-6-astra) per current chunk. Check the available model list; report unavailable models rather
+in this collaboration API. Choose light (gpt-6-luna), medium (gpt-5.6-terra), complex
+(gpt-6.1-sol) or, for the hardest chunks only, hardest (gpt-6-astra) per current chunk. Check the available model list; report unavailable models rather
 than substituting silently. Respect actual runtime concurrency, including the coordinator slot.
 
 Record returned worker IDs and ownership in the queue. Use the available agent messaging, wait,

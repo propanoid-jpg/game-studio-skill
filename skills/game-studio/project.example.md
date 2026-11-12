@@ -34,6 +34,7 @@ the main session writes other files. Keep them equal to the values below.
 - Total engine runs across all workers: <N>   Per worker: <N>   Windowed overall: <N>
 - Windowed runs off-screen at: <position flag>
 - Load check command: <process count / CPU>
+- Stalled worker (`<stall_minutes>`): no new evidence-folder output for <e.g. 30> minutes
 - Disk: evidence budget per task (`<evidence_budget>`): <e.g. 1 GB>   Minimum free disk
   (`<min_free_disk>`): <e.g. 100 GB>   Free-disk check command: <e.g. df -h>
 

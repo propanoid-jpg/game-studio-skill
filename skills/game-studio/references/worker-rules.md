@@ -22,7 +22,14 @@ Paths, tools and numbers come from `project.md`.
 - Engine runs: every run under `<timeout>`; isolated user-data dirs (absolute paths) in your
   evidence folder; at most `<per_worker_runs>` concurrent runs of yours (`<total_engine_runs>`
   across all workers); windowed runs off-screen (not minimized), at most one at a time.
-- Never kill processes you did not start. Leave no windows, shells or monitors behind.
+- Stop only processes you started and whose ID you recorded, never by name or from a process
+  list (the user's own game may be running). Own every run you start until it exits; leave no
+  windows, shells, monitors or orphan runs behind.
+- Wait without polling: start long runs in the background and wait for the exit notification, or
+  use one blocking command with a timeout; read the log once at the end.
+- Start `handoff.txt` early and keep it current, so a hang or a full context loses nothing.
+- "All" means all: cover the whole set the brief names; report the counts and list every
+  exclusion with its reason.
 - Disk: keep your evidence folder under `<evidence_budget>` and capture only what the comparisons
   need. At handoff delete raw captures, comparison iterations except the final one, probe and
   scratch output, frame dumps and isolated user-data dirs; keep the handoff, current criteria,
@@ -124,7 +131,7 @@ Several workers may edit one tree at once.
 
 ## Model boundary
 
-Follow SKILL.md "Route by current chunk complexity". Keep focused checks with coupled implementation; once design is settled, hand repeated corpus/suite/routine validation to a fresh Sol/sonnet chunk (fixed named-test runs may use Luna/haiku). Workers report gaps and never launch replacement workers.
+Follow SKILL.md "Route by current chunk complexity". Keep focused checks with coupled implementation; once design is settled, hand repeated corpus/suite/routine validation to a fresh mid-tier chunk (fixed named-test runs may use the cheapest). Workers report gaps and never launch replacement workers.
 
 ## Handoff
 

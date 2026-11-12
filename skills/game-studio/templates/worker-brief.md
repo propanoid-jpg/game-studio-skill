@@ -6,8 +6,8 @@ coordinator's conversation or memory.
 
 ```text
 You are a fresh worker on <project> (workspace root <workspace_root>; engine project <engine_root>).
-CHUNK MODEL: <runtime-valid model>; complexity: <light | medium | complex>; reason: <current work or concrete failure>
-VALIDATION HANDOFF: <focused checks retained; exact routine checks and next fresh Sol/Luna owner after design settles>
+CHUNK MODEL: <runtime-valid model>; complexity: <light | medium | complex | hardest>; reason: <current work or concrete failure>
+VALIDATION HANDOFF: <focused checks retained; exact routine checks and next fresh cheaper-tier owner after design settles>
 ROLE: <Feature/system worker | Art owner | Prep worker | Integration/validation worker |
        QA/test-health worker | Balance worker | Visual polish/review worker | Knowledge keeper |
        Release manager>  (definitions: <skill_dir>/references/roles.md)

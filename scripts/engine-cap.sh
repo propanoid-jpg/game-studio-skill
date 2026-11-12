@@ -12,7 +12,8 @@ count=0
 case "$(uname -s 2>/dev/null)" in
   MINGW*|MSYS*|CYGWIN*)
     # Windows under Git Bash: image names from tasklist, substring match, case-insensitive.
-    count=$(MSYS_NO_PATHCONV=1 tasklist.exe /FO CSV /NH 2>/dev/null | cut -d, -f1 | grep -ci -- "$name")
+    # Skip *_console launchers: each Windows engine run is a console launcher plus its real child.
+    count=$(MSYS_NO_PATHCONV=1 tasklist.exe /FO CSV /NH 2>/dev/null | cut -d, -f1 | grep -i -- "$name" | grep -vci -- "_console")
     ;;
   *)
     if command -v pgrep >/dev/null 2>&1; then

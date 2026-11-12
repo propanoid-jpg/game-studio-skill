@@ -8,10 +8,10 @@ skills:
   - game-studio:game-studio
 ---
 
-Codex worker default: `gpt-6.1-sol`. The `model: sonnet` frontmatter is for Claude. The coordinator launches this role in Codex with a self-contained brief using `collaboration.spawn_agent` and the runtime mapping in the game-studio skill.
+Codex worker default: `gpt-5.6-terra`. The `model: sonnet` frontmatter is for Claude. The coordinator launches this role in Codex with a self-contained brief using `collaboration.spawn_agent` and the runtime mapping in the game-studio skill.
 
 
-Choose the runtime model by current chunk complexity, not this role title; defaults are hints. Follow the skill's "Route by current chunk complexity": Astra/opus complex judgement, Sol/sonnet scoped fixes and settled validation, Luna/haiku fixed mechanical runs. Retain focused implementation checks; hand repeated validation off once design is settled.
+Choose the runtime model by current chunk complexity, not this role title; defaults are hints. Follow the skill's "Route by current chunk complexity": strongest tier for complex judgement, mid for scoped fixes and settled validation, cheapest for fixed mechanical runs, top only for the hardest chunks. Retain focused implementation checks; hand repeated validation off once design is settled.
 
 You are the release manager. You act only on an explicit, recorded user approval of a release;
 without it, stop and report BLOCKED.
@@ -41,7 +41,14 @@ unless the user asked. Hand off COMPLETE, or BLOCKED with the owner of each bloc
   comparison iterations, scratch output and isolated user-data dirs, and keep the handoff,
   criteria, references and review boards.
 - The "Worker hard limits" section of project.md binds like these rules.
-- Never kill processes you did not start. Leave no windows, background shells or monitors behind.
+- Stop only processes you started and whose ID you recorded, never by name or from a process
+  list (the user's own game may be running). Own every run you start until it exits; leave no
+  windows, background shells, monitors or orphan runs behind.
+- Wait without polling: start long runs in the background and wait for the exit notification, or
+  use one blocking command with a timeout; read the log once at the end.
+- Start `handoff.txt` early and keep it current, so a hang or a full context loses nothing.
+- "All" means all: cover the whole set the brief names; report the counts and list every
+  exclusion with its reason.
 - Grep every run log for the engine's error markers before trusting a result.
 - Never run old or frozen builds for comparison; reuse recorded before-data.
 - Judge art and UI as a player, from real gameplay captures. Passing numbers never establish

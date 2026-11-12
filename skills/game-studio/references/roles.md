@@ -4,7 +4,7 @@ Each role lists responsibilities, allowed actions, owned files, outputs and hand
 names exactly one role. Every worker role also obeys `worker-rules.md`; only the coordinator talks to
 the user or launches workers. Paths and tools come from `project.md`.
 
-Model selection follows the current chunk, not the role: see SKILL.md "Route by current chunk complexity". Defaults below are hints and every launch passes an explicit model.
+Model selection follows the current chunk, not the role: see SKILL.md "Route by current chunk complexity". Defaults below are hints and every launch passes an explicit model. No role defaults to the top tier (`fable` in Claude); it is an escalation for the hardest chunks.
 
 Evidence folder convention: `<evidence_dir>/<stream>/<task>/`.
 
@@ -13,20 +13,20 @@ In Claude, with the `game-studio` plugin installed, each worker role has an agen
 
 | Role | Agent | Claude default | Codex default |
 |---|---|---|---|
-| Feature/system worker | `feature-dev` | sonnet (opus for unknown-cause debugging) | gpt-6.1-sol (gpt-6-astra for unknown-cause debugging) |
-| Feature worker on UI | `ui-dev` | sonnet | gpt-6.1-sol |
-| Art owner (one per slot) | `art-owner` | opus | gpt-6-astra |
-| Asset generation worker | `asset-gen` | opus | gpt-6-astra |
-| Audio generation worker | `audio-gen` | opus | gpt-6-astra |
-| Prep worker | `prep` | sonnet | gpt-6.1-sol |
-| Integration/validation worker | `integration` | sonnet | gpt-6.1-sol |
-| QA/test-health worker | `qa` | sonnet | gpt-6.1-sol |
-| Balance worker | `balance` | opus | gpt-6-astra |
-| Visual polish/review worker | `visual-review` | opus | gpt-6-astra |
+| Feature/system worker | `feature-dev` | sonnet (opus for unknown-cause debugging) | gpt-5.6-terra (gpt-6.1-sol for unknown-cause debugging) |
+| Feature worker on UI | `ui-dev` | sonnet | gpt-5.6-terra |
+| Art owner (one per slot) | `art-owner` | opus | gpt-6.1-sol |
+| Asset generation worker | `asset-gen` | opus | gpt-6.1-sol |
+| Audio generation worker | `audio-gen` | opus | gpt-6.1-sol |
+| Prep worker | `prep` | sonnet | gpt-5.6-terra |
+| Integration/validation worker | `integration` | sonnet | gpt-5.6-terra |
+| QA/test-health worker | `qa` | sonnet | gpt-5.6-terra |
+| Balance worker | `balance` | opus | gpt-6.1-sol |
+| Visual polish/review worker | `visual-review` | opus | gpt-6.1-sol |
 | Knowledge keeper | `knowledge-keeper` | haiku | gpt-6-luna |
-| Release manager | `release-manager` | sonnet | gpt-6.1-sol |
+| Release manager | `release-manager` | sonnet | gpt-5.6-terra |
 | Surveyor (mechanical read-only work) | `surveyor` | haiku | gpt-6-luna |
-| Coordinator helper (optional) | `coordinator-helper` | sonnet | gpt-6.1-sol |
+| Coordinator helper (optional) | `coordinator-helper` | sonnet | gpt-5.6-terra |
 
 The art owner's tools include `mcp__blender__*`; a project using another art-tool MCP server copies
 `agents/art-owner.md` into its `.claude/agents/` under a new name and edits the `tools` line.
@@ -54,7 +54,7 @@ WebFetch, WebSearch, AskUserQuestion; no Write and no MCP tools. A hook warns (o
 **Allowed:** launching and messaging workers, reviewing, read-only checks, deciding without asking
 except protected design decisions and releases.
 
-**Owns (edits directly):** the queue doc and acceptance lines, the decision log, its memory and
+**Owns (edits directly):** the queue doc (open work only), the decision log, its memory and
 `project.md`. The project instruction file (on user direction) and status or knowledge-base pages
 are edited by workers it briefs.
 

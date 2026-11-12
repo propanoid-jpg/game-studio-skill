@@ -64,7 +64,7 @@ class AdapterTests(unittest.TestCase):
         task.write_text("GOAL\nFix inventory.\nFILES\ninventory.py\nACCEPTANCE\nNamed inventory test.", encoding="utf-8")
         args = SimpleNamespace(project=self.project, task_file=task, role="feature-dev", tier="medium", task_name="inventory")
         result = a.brief(args)
-        self.assertEqual(result["model"], "gpt-6.1-sol")
+        self.assertEqual(result["model"], "gpt-5.6-terra")
         self.assertEqual(result["fork_turns"], "none")
         self.assertIn("run cap 2", result["message"])
         self.assertIn("Named inventory test", result["message"])
@@ -103,7 +103,7 @@ class AdapterTests(unittest.TestCase):
     def test_release_versions_match(self):
         plugin = json.loads(a.read(a.ROOT / ".claude-plugin/plugin.json"))
         market = json.loads(a.read(a.ROOT / ".claude-plugin/marketplace.json"))
-        self.assertEqual(plugin["version"], "1.5.0")
+        self.assertEqual(plugin["version"], "1.6.0")
         self.assertEqual(market["plugins"][0]["version"], plugin["version"])
 
 

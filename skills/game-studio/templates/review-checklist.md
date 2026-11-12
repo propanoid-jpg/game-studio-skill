@@ -13,6 +13,8 @@ something needs re-running, that is a follow-up brief.
 
 ## Scope and rules
 
+- [ ] Coverage: the handoff covers the whole set the brief named ("all" means all); counts match
+      and every exclusion is listed with a reason.
 - [ ] Only assigned files edited; shared files changed with targeted edits; nothing reverted.
 - [ ] Tests exit non-zero on failure; no coverage deleted without a note.
 - [ ] No old/frozen build runs; before-data came from records.
@@ -35,13 +37,14 @@ something needs re-running, that is a follow-up brief.
 - [ ] Protected design decisions and project policies intact.
 - [ ] Owning docs updated; no task-report docs created.
 
-- [ ] Next model follows remaining chunk complexity; settled routine validation leaves Astra/opus, with exact checks and ownership handed to fresh Sol/sonnet or fixed-run Luna/haiku. Escalations cite concrete complexity/failure.
+- [ ] Next model follows remaining chunk complexity; settled routine validation leaves the strongest tier, with exact checks and ownership handed to a fresh mid-tier or fixed-run cheapest worker. Escalations (to the top tier included) cite concrete complexity or a documented failure.
 
 ## Decide and record
 
 - [ ] Verdict: accept / accept with follow-ups / follow-up brief (same worker if running, else fresh).
-- [ ] `<queue_doc>`: targeted edit marking acceptance with date and handoff path, plus decisions.
+- [ ] `<queue_doc>`: accepted item deleted (open work only), follow-ups added as one line each; decisions in the decision log.
 - [ ] Vault (when configured): a knowledge-keeper update is briefed for any decision or system fact introduced, and a reported vault gap becomes a keeper task; decision log updated.
 - [ ] Each "For the coordinator" finding routed (S0 now; S1 next brief; S2/S3 polish list).
-- [ ] Finished worker cleaned up (shells, monitors, idle tools); next task(s) launched immediately;
-      freed exclusive-tool slot refilled first; load and free disk checked.
+- [ ] Finished worker cleaned up (shells, monitors, idle tools); every free slot filled with independent
+      queue items; freed exclusive-tool slot refilled first; load and free disk checked; other
+      running workers checked for stalls.
