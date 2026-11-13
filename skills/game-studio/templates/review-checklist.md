@@ -43,7 +43,7 @@ something needs re-running, that is a follow-up brief.
 
 - [ ] Verdict: accept / accept with follow-ups / follow-up brief (same worker if running, else fresh).
 - [ ] `<queue_doc>`: accepted item deleted (open work only), follow-ups added as one line each; decisions in the decision log.
-- [ ] Vault (when configured): a knowledge-keeper update is briefed for any decision or system fact introduced, and a reported vault gap becomes a keeper task; decision log updated.
+- [ ] Vault (when configured): any decision or system fact introduced, and any reported vault gap, is on the queue doc's "Vault pending" list for the next batched knowledge-keeper brief; decision log updated.
 - [ ] Each "For the coordinator" finding routed (S0 now; S1 next brief; S2/S3 polish list).
 - [ ] Finished worker cleaned up (shells, monitors, idle tools); every free slot filled with independent
       queue items; freed exclusive-tool slot refilled first; load and free disk checked; other

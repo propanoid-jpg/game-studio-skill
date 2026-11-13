@@ -54,7 +54,9 @@ the signal to delegate.
 2. **Plan:** turn the user's direction into queue items split by file ownership; record them in the
    queue doc.
 3. **Brief:** write one self-contained brief per task with `/game-studio:studio-brief` (the brief is
-   the Agent prompt; workers see none of your conversation). Pick the role and model tier (`haiku`, `sonnet`, `opus`; `fable` only for the hardest chunks, per
+   the Agent prompt; workers see none of your conversation). Size it for about 80 tool calls and
+   name start points (files, functions, line anchors); role agents carry the hard limits, so paste
+   only the project's "Worker hard limits". Pick the role and model tier (`haiku`, `sonnet`, `opus`; `fable` only for the hardest chunks, per
    the skill's "Model choice"), and name models by their Claude names everywhere.
 4. **Launch:** start the role agents in parallel within the caps (check load and free disk first); refill freed
    exclusive-tool slots first. Launch every queue item that does not depend on a running worker,
@@ -64,7 +66,7 @@ the signal to delegate.
    key images, check claims against logs, check scope, caps and coverage ("all" in the brief means
    all; counts match). Never accept on a numeric pass alone.
 6. **Decide and record:** accept, accept with routed follow-ups, or brief a follow-up (escalate only for concrete complexity or a documented root-cause gap). Delete the accepted item from the queue doc (open work only, one line per item; the handoff is
-   the record), add follow-ups as new lines, and record any decision with its reason in the decision log; knowledge-base updates go to a `knowledge-keeper` worker.
+   the record), add follow-ups as new lines, and record any decision with its reason in the decision log. Make all of a review's queue changes in one Edit and Grep the section you need instead of re-reading the queue doc. Knowledge-base updates go on the queue doc's "Vault pending" list; brief one `knowledge-keeper` per milestone or per about five pending lines (at once for a user decision or correction).
 7. **Route:** S0 findings to the top of the queue with a worker now; the rest to the owner's next
    brief or a polish list.
 8. **Clean up:** stop the finished worker's background shells and monitors, and close idle tools it
@@ -98,7 +100,8 @@ user asks you to do a task yourself, you may still delegate it; say which worker
   happens, so a fresh session can continue from the files alone.
 - **Keep your context small:** read handoffs and the images they name, not worker transcripts or
   whole logs; use targeted reads; never paste a brief or a handoff back to the user.
-- **One session per goal.** When a goal or release is done, or after this session has been
-  compacted, tell the user once, at a quiet point (no workers running, or after
+- **One session per goal.** When a goal or release is done, or at this session's FIRST compaction
+  (do not wait for more: every later turn re-reads a full context), bring the queue doc and
+  decision log up to date and tell the user once, at a quiet point (no workers running, or after
   `/game-studio:studio-pause`), to start a fresh session and run `/game-studio:studio-resume`.
   Never interrupt running work for it, and keep working if the user prefers to stay.

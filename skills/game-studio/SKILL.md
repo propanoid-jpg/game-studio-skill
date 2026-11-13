@@ -31,8 +31,9 @@ clone (`~/.claude/plugins/marketplaces/game-studio/skills/game-studio/`), which
   `agent` setting (see the plugin README).
 - In Claude, launch workers as the role agents `game-studio:<role>` (`feature-dev`, `ui-dev`, `art-owner`,
   `prep`, `integration`, `qa`, `balance`, `visual-review`, `knowledge-keeper`, `release-manager`,
-  `surveyor`, `coordinator-helper`, `asset-gen`, `audio-gen`) instead of a general-purpose agent. Each preloads this skill,
-  carries the hard worker rules and has no Agent tool. A `model` passed at launch overrides its default.
+  `surveyor`, `coordinator-helper`, `asset-gen`, `audio-gen`) instead of a general-purpose agent. Each
+  carries the hard worker rules in its own prompt and has no Agent, Skill or Monitor tool; the
+  skill is not preloaded into workers, because every worker call re-reads its whole context. A `model` passed at launch overrides its default.
 - Coordinator commands: `/game-studio:studio-brief`, `/game-studio:studio-review`,
   `/game-studio:studio-pause`, `/game-studio:studio-resume`, `/game-studio:studio-setup-assets`,
   `/game-studio:studio-setup-wiki`.
@@ -51,7 +52,7 @@ clone (`~/.claude/plugins/marketplaces/game-studio/skills/game-studio/`), which
 |---|---|
 | `project.md` | start of every session: the project's paths, tools, caps and policies |
 | `references/roles.md` | choosing a role, writing a brief, routing a finding |
-| `references/worker-rules.md` | CANONICAL worker rules; paste the hard limits plus `project.md` "Worker hard limits" into every brief |
+| `references/worker-rules.md` | CANONICAL worker rules; role agents carry the hard limits, so a brief pastes only `project.md` "Worker hard limits" (both blocks for Codex or general-purpose launches) |
 | `references/workflow.md` | planning or implementing a feature, UI/graphics or art change |
 | `references/qa.md` | testing, corpora, bots, balance tables, triage |
 | `references/release.md` | only after explicit user approval of a release |
@@ -130,7 +131,8 @@ role agents in Codex. Never pass `haiku`, `sonnet`, `opus` or `fable` as a Codex
 ### Model choice
 
 Pass a model on every worker launch. Take the cheapest model that can do the task well and escalate on a
-failed review, not by default.
+failed review, not by default. A model above the role's default needs a concrete reason on the brief's
+CHUNK MODEL line; knowledge-keeper, surveyor and QA launches stay on their default without one.
 
 | Tier | Use for |
 |---|---|
@@ -175,7 +177,9 @@ corpus integration, or `model: "gpt-6-luna"` for an exact named-test run. Claude
   that changes files, produces content (docs and knowledge-base pages included), researches or
   looks things up goes to a worker, however small. Management questions (priorities, status,
   decisions, plans, reviews) are answered directly. When unsure, delegate.
-- **Fresh worker per chunk**, with a self-contained brief. Workers have no access to the
+- **Fresh worker per chunk**, with a self-contained brief sized for about 80 tool calls (a worker's
+  cost grows with calls times context; never below about 50, each fresh worker pays to orient). Name
+  start points (files, functions, line anchors) so the worker does not spend its first calls searching. Workers have no access to the
   coordinator's memory: paths, decisions, limits and prior evidence go in the brief.
 - **Workers never talk to the user and never launch sub-workers.** They decide within scope and
   record decisions in the handoff.
@@ -199,9 +203,11 @@ corpus integration, or `model: "gpt-6-luna"` for an exact named-test run. Claude
    still running, else fresh). Never accept on a numeric pass alone.
 3. **Record:** delete the accepted item from `<queue_doc>` (the queue holds open work only, one
    line per item; the handoff is the record) and add its follow-ups as new lines; decisions go in the
-   decision log; any decision or system fact the handoff introduces goes to a
-   knowledge-keeper worker for a vault update (pages, index, log) in the same loop, and a
-   vault gap the handoff reports becomes a keeper task, not a note.
+   decision log. Make all of a review's queue changes in one Edit, and Grep the queue section you
+   need instead of re-reading the doc. A decision or system fact the handoff introduces, or a vault
+   gap it reports, becomes a line under the queue doc's "Vault pending" list; one knowledge-keeper
+   brief clears the list at each milestone or when it reaches about five lines (at once for a user
+   decision or correction).
 4. **Route findings:** urgent defects to the top of the queue and a brief now; the rest to the
    owner's next brief or a polish list.
 5. **Clean up:** stop the finished worker's background shells and monitors, and close idle tools it
@@ -274,6 +280,10 @@ The coordinator keeps `<queue_doc>` as the single queue: what runs, who owns it,
 - **Judge art and UI as a player**, from real gameplay captures, not by metrics. Passing numbers
   never establish quality, readability or feel.
 - **Never run old or frozen builds** for comparison; reuse recorded before-data.
+- **Token economy** (worker rules carry the detail): wait in blocking chunks of at most 270 s,
+  batch independent lookups into one message, keep run output in log files, review boards rather
+  than every capture. Keep the project instruction file under about 10 KB: it is loaded into every
+  call of every worker; reference material belongs in the vault.
 - **Lean workflow:** no provenance manifests, hash files, task reports or one-off scripts; scripts
   must be reusable; docs only where they have lasting value (update existing ones).
   **Exception:** generated assets carry a mandatory manifest per asset folder — it is a
@@ -349,8 +359,9 @@ The vault is the project's Obsidian knowledge base, built and maintained by the
 `project.md` configures one, every worker queries it first for knowledge questions
 (index, then pages, one level of wikilinks), cites the wiki page and the repo source
 path, and reports a vault gap as a keeper finding instead of working around it.
-After every accepted handoff and user decision or correction, the coordinator briefs a
-knowledge-keeper worker to update the vault (pages, index, log); sync (source-hash
+The coordinator collects vault updates from accepted handoffs in the queue doc's "Vault pending"
+list and briefs one knowledge-keeper worker per milestone or per about five pending lines (at once
+for a user decision or correction) to update the vault (pages, index, log); sync (source-hash
 recompute, recompile only what drifted) and lint (`scripts/wiki-lint.py`) run at
 milestones and whenever drift is suspected. Repository docs stay the raw sources, cited
 by path with their hash; they are never copied into the vault's `raw/` folder. When no
@@ -364,5 +375,6 @@ a keeper brief. Workers never delete a vault.
 Use `templates/worker-brief.md`. Every brief states: role, one-sentence goal, scope and non-goals;
 files owned and shared; inputs (queue lines, docs, prior handoffs, before-data); acceptance
 criteria; resource caps as numbers, the disk budget, exclusive-tool status, evidence folder; the
-pasted worker-rule hard limits followed by the "Worker hard limits" section of `project.md`; the
+"Worker hard limits" section of `project.md` (plus the worker-rule hard limits for a launch that
+is not a Claude role agent); the call budget, the image budget and the skill directory; the
 handoff format and the next owner.

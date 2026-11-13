@@ -133,7 +133,7 @@ compaction.
 ### Agents
 
 Launch workers with the Agent tool as `subagent_type: "game-studio:<agent>"` (or mention
-`@agent-game-studio:<agent>`). Every agent preloads the `game-studio` skill, carries the hard worker
+`@agent-game-studio:<agent>`). Only the coordinator preloads the `game-studio` skill; every worker agent carries the hard worker
 rules (targeted tests only, resource caps, off-screen windows, never kill processes it did not
 start, keep the shared tree parseable, judge like a player, sketch-first visual workflow), writes a
 handoff, never talks to the user and has no Agent tool, so it cannot launch sub-agents. A `model`
@@ -250,6 +250,21 @@ ownership, writes one brief per task with `/game-studio:studio-brief`, launches 
 before recording acceptance and launching the next task.
 
 ## Changelog
+
+- **1.7.0** (token efficiency, from an analysis of 2,046 worker runs)
+  - Workers no longer preload the skill and lose the Skill and Monitor tools: a smaller prompt on
+    every call. Briefs for role agents paste only the project's "Worker hard limits" and name the
+    skill directory.
+  - Wait rule replaced: blocking chunks of at most 270 s on a done-condition (the prompt cache
+    lives 5 minutes); idle waits only beyond about 45 minutes. The shell hook warns on long bare
+    sleeps and idle echoes.
+  - New worker rules: batch independent lookups in one message, keep run output in log files,
+    an image budget, and a budget of about 80 tool calls with a PARTIAL handoff beyond it.
+  - Routing: a model above the role default needs a reason in the brief; surveyor and
+    knowledge-keeper run at low effort.
+  - Coordinator: one queue Edit per review, vault updates batched through a "Vault pending" list,
+    a fresh session at the first compaction, and a session-start warning when the project
+    instruction file exceeds 10 KB.
 
 - **1.6.0** (fixes from a month of real studio sessions)
   - Codex tiers are now Luna, Terra, Sol, Astra (cheapest to top); Sol and Astra each moved up one tier.

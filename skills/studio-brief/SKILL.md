@@ -23,9 +23,11 @@ Coordinator (or `game-studio:coordinator-helper`). Follows section 15 of the `ga
    art owner ("owner, slot X") or state that the worker owns none.
 4. Evidence folder: `<evidence_dir>/<stream>/<task>/` (from project.md; plugin option `evidence_dir`). Engine caps
    (as numbers) and the disk budget from `project.md`.
-5. Paste the "Hard limits" block from
-   `${CLAUDE_PLUGIN_ROOT}/skills/game-studio/references/worker-rules.md` verbatim, then the
-   "Worker hard limits" section of `project.md` verbatim.
+5. Paste the "Worker hard limits" section of `project.md` verbatim. Claude role agents carry the
+   skill's hard limits already; only for a Codex or general-purpose launch also paste the "Hard
+   limits" block from `${CLAUDE_PLUGIN_ROOT}/skills/game-studio/references/worker-rules.md`.
+   Set SKILL DIR to `${CLAUDE_PLUGIN_ROOT}/skills/game-studio`, size the chunk for about 80 tool
+   calls, and name start points (files, functions, line anchors).
 6. Add the role-specific lines from the template. In Claude, launch with the Agent tool using
    `subagent_type: "game-studio:<role>"`. In Codex, use `collaboration.spawn_agent` with `task_name`,
    `message`, the mapped `model`, and `fork_turns: "none"` for a fresh worker. Record the launch in the queue doc.

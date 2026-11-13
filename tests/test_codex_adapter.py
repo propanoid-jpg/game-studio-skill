@@ -103,7 +103,7 @@ class AdapterTests(unittest.TestCase):
     def test_release_versions_match(self):
         plugin = json.loads(a.read(a.ROOT / ".claude-plugin/plugin.json"))
         market = json.loads(a.read(a.ROOT / ".claude-plugin/marketplace.json"))
-        self.assertEqual(plugin["version"], "1.6.0")
+        self.assertEqual(plugin["version"], "1.7.0")
         self.assertEqual(market["plugins"][0]["version"], plugin["version"])
 
 

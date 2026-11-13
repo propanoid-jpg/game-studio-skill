@@ -1,12 +1,15 @@
 # Worker rules (canonical)
 
-The rules every worker follows. The coordinator links this file in every brief and pastes the
-"Hard limits" block, followed by the project's own "Worker hard limits" section from `project.md`.
+The rules every worker follows. Claude role agents (`game-studio:<role>`) carry the "Hard limits"
+block in their own prompt, so their brief pastes only the project's "Worker hard limits" section
+from `project.md`. Any other launch (Codex, a general-purpose agent) gets both blocks pasted.
 Paths, tools and numbers come from `project.md`.
 
 ## Hard limits (paste into every brief)
 
-- Read the project instruction file, `project.md` and the top of `<queue_doc>` first. When a
+- The brief is self-contained (project hard limits and the queue lines that matter are in it).
+  Read the project instruction file if it is not already in your context; do not read
+  `project.md` or `<queue_doc>` whole, Grep the one section you need. When a
   vault is configured, query it first for any knowledge question (`wiki/index.md`, then the
   relevant pages, per `references/knowledge-vault.md`) before grepping raw docs, and cite the
   wiki page and the repo source path. A pure code task that touches no documented system,
@@ -25,8 +28,19 @@ Paths, tools and numbers come from `project.md`.
 - Stop only processes you started and whose ID you recorded, never by name or from a process
   list (the user's own game may be running). Own every run you start until it exits; leave no
   windows, shells, monitors or orphan runs behind.
-- Wait without polling: start long runs in the background and wait for the exit notification, or
-  use one blocking command with a timeout; read the log once at the end.
+- Wait in blocking chunks: one command of at most 270 s that returns on a done-condition
+  (`timeout 270 bash -c 'until <done>; do sleep 5; done'`), repeated until done, with no status
+  reads, `echo` or bare `sleep` calls in between; read the log once at the end. The prompt cache
+  lives 5 minutes, so a longer silent gap re-bills the whole context: go idle on a background
+  run's exit notification only for a wait expected to exceed about 45 minutes.
+- Every call re-reads the whole context, so make fewer, fuller calls: issue independent reads,
+  greps and status checks together in one message, and chain related shell steps in one command.
+- Keep output out of the context: send run output to a log file and print only a summary line or
+  the matching error lines; Read large files with `offset`/`limit` or Grep them; open review
+  boards and contact sheets rather than every capture (image budget in the brief, 12 if unset).
+- Budget: about 80 tool calls, or the number in the brief. If the work is not nearly done by
+  then, stop at a building state and hand off PARTIAL with the exact resume point; never run on
+  into context compaction.
 - Start `handoff.txt` early and keep it current, so a hang or a full context loses nothing.
 - "All" means all: cover the whole set the brief names; report the counts and list every
   exclusion with its reason.

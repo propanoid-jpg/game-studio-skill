@@ -37,6 +37,18 @@ class HookTests(unittest.TestCase):
         self.assertIn("project.md", started)
         self.assertNotIn("fresh session", started)
 
+    def test_engine_cap_warns_on_wasteful_waits_only(self):
+        quiet = {"CLAUDE_PLUGIN_OPTION_ENGINE_PROCESS": ""}
+        for cmd in ("sleep 600", "Start-Sleep -Seconds 300", "echo idle"):
+            self.assertIn("wasteful wait", run("engine-cap.sh", '{"tool_input":{"command":"%s"}}' % cmd, **quiet))
+        for cmd in ("sleep 5", "timeout 270 bash -c 'until grep -q DONE log; do sleep 5; done'", "ls"):
+            self.assertEqual(run("engine-cap.sh", '{"tool_input":{"command":"%s"}}' % cmd, **quiet), "")
+
+    def test_session_start_flags_a_large_instruction_file(self):
+        with open(os.path.join(self.project, "AGENTS.md"), "w") as f:
+            f.write("x" * 20000)
+        self.assertIn("AGENTS.md is 19 KB", run("session-start.sh", '{"source":"startup"}', CLAUDE_PROJECT_DIR=self.project))
+
     def test_engine_cap_skips_console_launchers(self):
         self.assertIn('grep -vci -- "_console"', (ROOT / "scripts" / "engine-cap.sh").read_text(encoding="utf-8"))
 

@@ -1,13 +1,17 @@
 # Worker brief template
 
 Before launching, choose the worker's model tier and runtime ID per SKILL.md "Runtime model mapping" and "Model choice". Copy, fill every `<...>`,
-delete lines that do not apply. The brief must be self-contained: the worker cannot see the
+delete lines that do not apply. Size the chunk for about 80 tool calls (never below about 50: every
+fresh worker pays an orientation cost) and split larger work by file ownership. A model above the
+role's default needs its reason on the CHUNK MODEL line. The brief must be self-contained: the worker cannot see the
 coordinator's conversation or memory.
 
 ```text
 You are a fresh worker on <project> (workspace root <workspace_root>; engine project <engine_root>).
 CHUNK MODEL: <runtime-valid model>; complexity: <light | medium | complex | hardest>; reason: <current work or concrete failure>
 VALIDATION HANDOFF: <focused checks retained; exact routine checks and next fresh cheaper-tier owner after design settles>
+BUDGET: about <80> tool calls, then hand off PARTIAL with a resume point; image reads <12>, boards first
+SKILL DIR: <skill_dir>
 ROLE: <Feature/system worker | Art owner | Prep worker | Integration/validation worker |
        QA/test-health worker | Balance worker | Visual polish/review worker | Knowledge keeper |
        Release manager>  (definitions: <skill_dir>/references/roles.md)
@@ -20,6 +24,7 @@ CONTEXT
 - User direction / queue lines: <quote or cite <queue_doc> section and date>
 - Vault lookup (mandatory when a vault is configured; a pure code task is exempt unless it touches a documented system): <wiki/index.md, then pages consulted, or "vault does not answer: <question>" as a keeper finding>
 - Docs and prior handoffs: <paths>
+- Start points: <files with function names or line anchors, so the worker needs no orientation pass>
 - Recorded before-data to reuse (never rerun old builds): <paths>
 - Decisions already made by the coordinator: <list, with dates>
 
@@ -50,8 +55,9 @@ RESOURCES
   never close a session you did not launch." | "You do not own any exclusive-tool slot.">
 - Image generation: <budget N, log prompts | none>
 
-WORKER RULES (canonical: <skill_dir>/references/worker-rules.md; read it)
-<paste the "Hard limits" block from worker-rules.md>
+WORKER RULES (canonical: <skill_dir>/references/worker-rules.md)
+<Claude role agent: nothing here, it carries the hard limits already. Codex or general-purpose
+ launch: paste the "Hard limits" block from worker-rules.md>
 <paste the "Worker hard limits" section from project.md>
 
 HANDOFF

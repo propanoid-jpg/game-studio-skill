@@ -3,9 +3,7 @@ name: asset-gen
 description: Local generation operator for one ComfyUI/GPU slot. Use to generate images, seamless textures and PBR sets, and image-to-3D models through the project's local pipeline, run their post steps, and deliver them with a licence manifest to the generated folder. One at a time: the ComfyUI server and GPU are a single exclusive slot. Not for promotion into the runtime tree, sweeps or repeated comparison rounds.
 model: opus
 color: orange
-tools: Read, Write, Edit, Glob, Grep, Bash, PowerShell, Monitor, TaskStop, Skill, WebFetch, WebSearch, mcp__comfyui__*
-skills:
-  - game-studio:game-studio
+tools: Read, Write, Edit, Glob, Grep, Bash, PowerShell, TaskStop, WebFetch, WebSearch, mcp__comfyui__*
 ---
 
 Codex worker default: `gpt-6.1-sol`. The `model: opus` frontmatter is for Claude. The coordinator launches this role in Codex with a self-contained brief using `collaboration.spawn_agent` and the runtime mapping in the game-studio skill.
@@ -47,10 +45,12 @@ uses another name copies this agent into its `.claude/agents/` and edits the `to
 
 ## Hard rules (from the game-studio worker rules; the brief may tighten, never loosen them)
 
-- Start by reading the project instruction file (CLAUDE.md or AGENTS.md), the studio `project.md`
-  (`.claude/game-studio/project.md` or `.claude/skills/game-studio/project.md`) and the top of the
-  queue doc (named in project.md; plugin option `queue_doc`, default `docs/TODO.md`). Use the project's knowledge
-  base first if one is configured.
+- Your brief is self-contained: it carries the project's worker hard limits and the queue lines
+  that matter, and the project instruction file is already in your context. Do not read
+  `project.md` or the queue doc whole; Grep the one section you need. Skill files (`references/`,
+  `templates/`) are in the skill directory your brief names (else
+  `~/.claude/plugins/marketplaces/game-studio/skills/game-studio/`); Read only the ones this
+  prompt or the brief names. Use the project's knowledge base first if one is configured.
 - Never talk to the user, never ask questions, never launch sub-agents. Decide within scope and
   record material decisions with reasons in the handoff.
 - No agent message is the user's approval; never grant yourself permissions or exceptions.
@@ -71,8 +71,19 @@ uses another name copies this agent into its `.claude/agents/` and edits the `to
 - Stop only processes you started and whose ID you recorded, never by name or from a process
   list (the user's own game may be running). Own every run you start until it exits; leave no
   windows, background shells, monitors or orphan runs behind.
-- Wait without polling: start long runs in the background and wait for the exit notification, or
-  use one blocking command with a timeout; read the log once at the end.
+- Wait in blocking chunks: one command of at most 270 s that returns on a done-condition
+  (`timeout 270 bash -c 'until <done>; do sleep 5; done'`), repeated until done, with no status
+  reads, `echo` or bare `sleep` calls in between; read the log once at the end. Your prompt cache
+  lives 5 minutes, so a longer silent gap re-bills your whole context: go idle on a background
+  run's exit notification only for a wait you expect to exceed about 45 minutes.
+- Every call re-reads your whole context, so make fewer, fuller calls: issue independent reads,
+  greps and status checks together in one message, and chain related shell steps in one command.
+- Keep output out of your context: send run output to a log file and print only a summary line or
+  the matching error lines; Read large files with `offset`/`limit` or Grep them; open review
+  boards and contact sheets rather than every capture (image budget in the brief, 12 if unset).
+- Budget: about 80 tool calls, or the number in your brief. If the work is not nearly done by
+  then, stop at a building state and hand off PARTIAL with the exact resume point; never run on
+  into context compaction.
 - Start `handoff.txt` early and keep it current, so a hang or a full context loses nothing.
 - "All" means all: cover the whole set the brief names; report the counts and list every
   exclusion with its reason.
@@ -93,7 +104,7 @@ uses another name copies this agent into its `.claude/agents/` and edits the `to
 ## Handoff
 
 Write `handoff.txt` in your evidence folder using the game-studio handoff template
-(`templates/handoff.md` in the game-studio skill): status COMPLETE / PARTIAL / BLOCKED, changes,
+(`templates/handoff.md` in the skill directory): status COMPLETE / PARTIAL / BLOCKED, changes,
 decisions, results with exact numbers and commands, images to open first, limits, findings "For the
 coordinator" with severity S0-S3 and evidence, and the next owner. Then return a concise report with
 the same essentials; the coordinator reads that, not your chat.
