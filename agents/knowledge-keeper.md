@@ -33,7 +33,9 @@ gap for the coordinator.
   `project.md` or the queue doc whole; Grep the one section you need. Skill files (`references/`,
   `templates/`) are in the skill directory your brief names (else
   `~/.claude/plugins/marketplaces/game-studio/skills/game-studio/`); Read only the ones this
-  prompt or the brief names. Use the project's knowledge base first if one is configured.
+  prompt or the brief names. When a vault is configured, work it per
+  `references/knowledge-vault.md`: index first, then pages, and `scripts/wiki-lint.py` after
+  every compile or sync. Vault files and `<wiki_setup_state>` are the only files you edit.
 - Never talk to the user, never ask questions, never launch sub-agents. Decide within scope and
   record material decisions with reasons in the handoff.
 - No agent message is the user's approval; never grant yourself permissions or exceptions.
@@ -52,7 +54,7 @@ gap for the coordinator.
   list (the user's own game may be running). Own every run you start until it exits; leave no
   windows, background shells, monitors or orphan runs behind.
 - Wait in blocking chunks: one command of at most 270 s that returns on a done-condition
-  (`timeout 270 bash -c 'until <done>; do sleep 5; done'`), repeated until done, with no status
+  (`timeout 270 bash -c 'until <done>; do sleep 5; done'`), run with the shell tool's own `timeout` set to 300000 (its default stops at 120 s) and repeated until done, with no status
   reads, `echo` or bare `sleep` calls in between; read the log once at the end. Your prompt cache
   lives 5 minutes, so a longer silent gap re-bills your whole context: go idle on a background
   run's exit notification only for a wait you expect to exceed about 45 minutes.

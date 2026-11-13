@@ -29,7 +29,7 @@ Paths, tools and numbers come from `project.md`.
   list (the user's own game may be running). Own every run you start until it exits; leave no
   windows, shells, monitors or orphan runs behind.
 - Wait in blocking chunks: one command of at most 270 s that returns on a done-condition
-  (`timeout 270 bash -c 'until <done>; do sleep 5; done'`), repeated until done, with no status
+  (`timeout 270 bash -c 'until <done>; do sleep 5; done'`), run with the shell tool's own `timeout` set to 300000 (its default stops at 120 s) and repeated until done, with no status
   reads, `echo` or bare `sleep` calls in between; read the log once at the end. The prompt cache
   lives 5 minutes, so a longer silent gap re-bills the whole context: go idle on a background
   run's exit notification only for a wait expected to exceed about 45 minutes.

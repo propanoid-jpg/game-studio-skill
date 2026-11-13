@@ -8,7 +8,7 @@ cmd=$(printf '%s' "$input" | tr -d '\n' | sed -n 's/.*"command"[[:space:]]*:[[:s
 secs=$(printf '%s' "$cmd" | sed -n -E 's/^[[:space:]]*(sleep|Start-Sleep( -Seconds| -s)?)[[:space:]]+([0-9]+)[[:space:]]*$/\3/p')
 case "$cmd" in "echo idle"|"echo w"|"echo waiting"|"echo wait") secs=999 ;; esac
 if [ -n "$secs" ] && [ "$secs" -gt 270 ]; then
-  msg="game-studio: wasteful wait. Wait in one blocking command of at most 270 s that returns on a done-condition (timeout 270 bash -c 'until <done>; do sleep 5; done'), repeat it until done, and do not poll with echo, sleep or status reads in between."
+  msg="game-studio: wasteful wait. Wait in one blocking command of at most 270 s that returns on a done-condition (timeout 270 bash -c 'until <done>; do sleep 5; done', with the tool timeout set to 300000), repeat it until done, and do not poll with echo, sleep or status reads in between."
   printf '{"systemMessage":"%s","hookSpecificOutput":{"hookEventName":"PreToolUse","additionalContext":"%s"}}\n' "$msg" "$msg"
   exit 0
 fi
