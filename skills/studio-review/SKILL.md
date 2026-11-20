@@ -16,9 +16,11 @@ Follows section 4 of the `game-studio` skill (`${CLAUDE_PLUGIN_ROOT}/skills/game
    - check claims against results files and logs; grep logs for the engine's error markers;
    - check scope (only assigned files), caps, no full sweep, no old-build runs, nothing loosened,
      evidence folder pruned to the disk budget;
-   - judge art and UI as a player; a numeric pass alone never accepts.
+   - judge art and UI as a player; a numeric pass alone never accepts, and visual work needs its
+     independent acceptance review (skill, "Quality without the user") before the item closes.
 3. Verdict: accept, accept with routed follow-ups, or a follow-up brief (same worker if it is still
    running, otherwise a fresh one; reassess remaining chunk complexity and cite a concrete reason for any escalation).
+   After two failed passes on the same item the next brief is a diagnosis, not a third pass.
    Once complex design is settled, route repeated validation to a fresh mid-tier worker; fixed named runs may use the cheapest. Preserve focused implementation checks and one quick gameplay review.
 4. Delete the accepted item from the queue doc (open work only) and add follow-ups as one line each;
    record decisions in the decision log; add knowledge-base updates to the queue doc's "Vault pending" list if a vault is configured (one knowledge-keeper brief per milestone or about five lines; at once for a user decision). Route each "For the coordinator" finding (S0 now, S1 next brief, S2/S3 polish list).

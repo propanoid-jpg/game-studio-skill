@@ -105,6 +105,13 @@ a missing vault with ad-hoc docs.
   `scripts/wiki-lint.py <wiki_root> --project-root <workspace_root>`.
 - Decision log / status page: <wiki page, e.g. [[decision-log]]>, or the queue doc if no vault
 
+## Quality bar and worker cap
+
+- Reference set (`<quality_refs>`): <the accepted assets, areas and screens that define "good
+  enough", per class (character, enemy, boss, area, hub, UI screen), plus style references. The
+  studio's acceptance reviews judge against these; the user is not asked to review boards.>
+- Max workers (`<max_workers>`): <e.g. 18; below the runtime's concurrent-agent limit>
+
 ## Opt-in policies (delete what you do not want)
 
 - Autonomy: user granted; never ask questions during a goal; decide, record, self-judge.

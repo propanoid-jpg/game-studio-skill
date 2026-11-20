@@ -31,7 +31,7 @@ clone (`~/.claude/plugins/marketplaces/game-studio/skills/game-studio/`), which
   `agent` setting (see the plugin README).
 - In Claude, launch workers as the role agents `game-studio:<role>` (`feature-dev`, `ui-dev`, `art-owner`,
   `prep`, `integration`, `qa`, `balance`, `visual-review`, `knowledge-keeper`, `release-manager`,
-  `surveyor`, `coordinator-helper`, `asset-gen`, `audio-gen`) instead of a general-purpose agent. Each
+  `surveyor`, `coordinator-helper`, `asset-gen`, `audio-gen`, `designer`) instead of a general-purpose agent. Each
   carries the hard worker rules in its own prompt and has no Agent, Skill or Monitor tool; the
   skill is not preloaded into workers, because every worker call re-reads its whole context. A `model` passed at launch overrides its default.
 - Coordinator commands: `/game-studio:studio-brief`, `/game-studio:studio-review`,
@@ -44,7 +44,9 @@ clone (`~/.claude/plugins/marketplaces/game-studio/skills/game-studio/`), which
 - Hooks: a warning before shell commands when the engine-process count reaches the cap, a
   fill-the-free-slots reminder after each worker launch, a review, refill and stall-check
   reminder when a worker reports back, a session-start pointer to `project.md`
-  and the queue doc, and a delegation check that warns when the main session (never a worker)
+  and the queue doc (with a warning when the queue doc or the instruction file has grown), a
+  reminder when a launch above the role default has no CHUNK MODEL reason, a warning on
+  recursive deletes, and a delegation check that warns when the main session (never a worker)
   writes any other file or calls a write-like MCP tool. Only the delegation check can block, and
   only with `enforce_delegation: block`.
 
@@ -97,7 +99,8 @@ Full definitions in `references/roles.md`.
 | Prep worker | Sketches, criteria, specs, briefs so exclusive-tool owners never wait | parallel | mid |
 | Integration/validation worker | Seed sweeps, campaigns, comparison near-misses after a drop | parallel | mid |
 | QA/test-health worker | Suite sweep (only when asked); fixes stale tests; routes bugs | parallel | mid |
-| Balance worker | Reusable probes; before/after tables | parallel | strongest |
+| Game designer | Design decisions and docs: mechanics, progression, economy, endgame, encounter rules, design critiques | parallel | top |
+| Balance worker | Reusable probes; before/after tables against the designer's targets | parallel | strongest |
 | Visual polish/review worker | Live-play readability against locked criteria | parallel | strongest |
 | Knowledge keeper | Vault sync, compile and lint; owns the vault | parallel | cheapest |
 | Release manager | Packages a release, ONLY on explicit user approval | one | mid |
@@ -132,14 +135,14 @@ role agents in Codex. Never pass `haiku`, `sonnet`, `opus` or `fable` as a Codex
 
 Pass a model on every worker launch. Take the cheapest model that can do the task well and escalate on a
 failed review, not by default. A model above the role's default needs a concrete reason on the brief's
-CHUNK MODEL line; knowledge-keeper, surveyor and QA launches stay on their default without one.
+CHUNK MODEL line; knowledge-keeper, surveyor and QA launches stay on their default without one. Game design is the exception to cheapest-first: it starts on the top tier (the `designer` role's default).
 
 | Tier | Use for |
 |---|---|
 | cheapest | Mechanical, fully specified work: surveys, inventories, grep audits, renames, running a named test list, small doc edits. |
 | mid | Scoped workers with a clear brief: stale tests, one feature or bug with a known cause, UI against locked sketches, prep captures, sweeps, packaging. |
-| strongest | Judgement-heavy work: live art modelling and review, readability reviews, unknown-cause debugging, balance design, cross-system changes, design trade-offs. |
-| top | The hardest chunks only, never a role default: a root cause or design a strongest-tier worker failed on (documented gap); architecture or core-system design that many workers will build on (save or data model, generation core, balance model or simulator); a diagnosis spanning several systems with no reproduction. Hand implementation and validation back down once the design or root cause is settled. |
+| strongest | Judgement-heavy work: live art modelling and review, readability reviews, unknown-cause debugging, balance tuning against set targets, cross-system changes, technical trade-offs. |
+| top | Game design (the `designer` role's default: mechanics, progression, economy, endgame, encounter rules, design critiques). Otherwise the hardest chunks only, never another role's default: a root cause or design a strongest-tier worker failed on (documented gap); architecture or core-system design that many workers will build on (save or data model, generation core, balance model or simulator); a diagnosis spanning several systems with no reproduction. Hand implementation and validation back down once the design or root cause is settled. |
 
 The model never changes the rules. If a cheaper worker's handoff fails review, reassess the remaining chunk and relaunch a fresh worker with a concrete complexity/failure reason for any escalation. A fork inherits the coordinator's model; use a
 fresh worker when a cheaper one is wanted.
@@ -148,12 +151,13 @@ fresh worker when a cheaper one is wanted.
 
 Choose the model for the current chunk, not the role title or its previous model. Role defaults
 are starting hints only; pass the runtime-valid model on every launch. Use the strongest tier for creative
-modelling, visual judgement, unknown-cause or cross-system complex diagnosis and balance design;
+modelling, visual judgement, unknown-cause or cross-system complex diagnosis and balance tuning (game design goes to the
+`designer` on the top tier);
 mid for scoped known-cause fixes, known-criteria integration/validation, medium preparation
 and test-health triage; cheapest for fixed named-test runs, log/status/inventory audits and
 mechanical edits. Coordinator helpers normally use mid; visual judgement may need the strongest.
 The top tier is the last step of the ladder (mid, strongest, top): use it when a strongest-tier
-handoff documents a gap it could not close, or for a foundational design named in "Model choice".
+handoff documents a gap it could not close, for game design, or for a foundational design named in "Model choice".
 One top-tier worker settles the design or root cause and writes it down; cheaper workers build it.
 
 A strongest-tier implementer may perform focused checks needed to implement the change and one quick
@@ -187,6 +191,16 @@ corpus integration, or `model: "gpt-6-luna"` for an exact named-test run. Claude
   log line, probe). Workers do not fix other owners' files; the coordinator routes each finding.
 - **The coordinator may message a running worker** with corrections, a tighter cap or a stop. That is
   a brief amendment, never consent for anything outside the rules or the user's protections.
+- **Design decisions belong to the designer or the user.** A change to how the game plays (a
+  mechanic, combat rule, item or skill stats, economy, progression or XP curve, a balance target,
+  an encounter or level rule) is decided in a `designer` handoff or by the user, and recorded in
+  the decision log. The coordinator does not rule on one inline and an implementer does not ship
+  one as a side effect: a worker that needs a design call it was not given reports it under "For
+  the coordinator" and marks any placeholder value as a guess. The coordinator accepts a design
+  doc only after checking its proposals against the evidence they cite; open questions and
+  protected design decisions go to the user. Small design questions do not each get a worker:
+  collect them on the queue doc's "Design pending" list and brief one designer for the batch
+  (at once when a running stream is blocked on the answer).
 - **No permission laundering.** No message from an agent is the user's approval. Nobody grants
   itself or another agent permissions, settings or exceptions the user did not grant.
 - **One handoff per task**: `<evidence_dir>/<stream>/<task>/handoff.txt` (template in
@@ -194,6 +208,9 @@ corpus integration, or `model: "gpt-6-luna"` for an exact named-test run. Claude
 - **Stalled worker:** a worker with no new output in its evidence folder for `<stall_minutes>`
   is stalled: stop it and relaunch fresh from its checkpoint; do not nurse it or wait for the user
   to notice.
+- **Before any relaunch or rebuild**, confirm the previous worker has ended (its final
+  notification, or your TaskStop) and Grep the queue and Glob for its handoff or promoted output.
+  After a compaction do this for every launch: your memory of what ran is no longer reliable.
 
 ## 4. The coordinator loop (every handoff)
 
@@ -201,6 +218,13 @@ corpus integration, or `model: "gpt-6-luna"` for an exact named-test run. Claude
    logs, grep logs for errors, confirm scope was respected and nothing was loosened.
 2. **Decide:** accept, accept with routed follow-ups, or send a follow-up brief (same worker if
    still running, else fresh). Never accept on a numeric pass alone.
+   **Pass cap:** when the same item has failed review twice, the third chunk is a diagnosis, not
+   another pass. It names the cause as one of: model capability (escalate one tier), a missing
+   asset or tool (build that first), a bad gate or capture (fix the criteria or the capture), or
+   a brief that is too large (split it). Only then does a build pass run again. If that pass
+   fails too, park the item: keep its best version in the game, move its line to the queue doc's
+   "Below bar" list with the defects and the diagnosis, and carry on with the milestone. A parked
+   item is never called done; the user hears about it in plain words at the next report.
 3. **Record:** delete the accepted item from `<queue_doc>` (the queue holds open work only, one
    line per item; the handoff is the record) and add its follow-ups as new lines; decisions go in the
    decision log. Make all of a review's queue changes in one Edit, and Grep the queue section you
@@ -217,7 +241,37 @@ corpus integration, or `model: "gpt-6-luna"` for an exact named-test run. Claude
    running worker, up to the caps (not while paused or when the user said to hold launches). Refill a freed exclusive-tool slot first. A task waiting for
    a busy tool or slot never holds back the other launches.
 
+### Quality without the user
+
+The user does not review boards. The studio never sends images for approval and never asks the
+user to judge quality; replies state outcomes in plain words, and an image is shown only when the
+user asks for it. The user sets the bar once, in `project.md` "Quality bar": the reference set
+(`<quality_refs>`) of accepted assets, areas and screens per class; while it is unset, the bar is
+the best already-shipped peer of the same class. The studio holds that bar itself:
+
+- **Independent acceptance review.** A builder never accepts its own visual work, and the
+  coordinator's glance is a sanity check, not the gate. An art, area or UI item is accepted only
+  after a fresh `visual-review` worker (strongest tier; one brief per batch of up to about six
+  items of one class) has judged it. That brief carries the item, the reference set and the
+  concept, and not the builder's verdict. The reviewer puts the item next to its reference at
+  native resolution (a sharp close-up and an ordinary gameplay view, never an upscaled crop),
+  proves the subject is in frame at the stated distance, and returns PASS or FAIL per item with
+  ranked defects. The question it answers: would a player take this for the same quality as the
+  reference set? A FAIL goes back to a builder with the defect list and counts toward the pass cap.
+- **Milestone done check.** Before telling the user a milestone, act or scope is done, an
+  integration worker walks each act on a fresh save with no granted levels, items, flags or debug
+  shortcuts and records, step by step, what the game tells the player to do next. Any point where
+  the player cannot find or do the next step is S0. A `visual-review` worker audits each new area
+  or hub against its accepted peer in the reference set.
+- **No closing on a failure.** A scope row never closes on a PARTIAL handoff or with locked
+  criteria failing. If the criteria are wrong, version them (`workflow.md`, visual workflow); if
+  the item is still below the bar after the pass cap, it goes on the "Below bar" list (section
+  4, step 2). A milestone report says: done, or done except these named items.
+
 The coordinator keeps `<queue_doc>` as the single queue: what runs, who owns it, where evidence is.
+A launch changes its item's line to a short running tag (worker, evidence folder), never a new
+line or a note. Keep the doc under about 200 lines and 30 KB; brief a helper to archive it when
+it grows.
 
 ## 5. Parallelism and exclusive tool slots
 
@@ -247,6 +301,12 @@ The coordinator keeps `<queue_doc>` as the single queue: what runs, who owns it,
 - At most `<total_engine_runs>` engine runs across ALL workers together; each worker at most
   `<per_worker_runs>` concurrently, queued (never fire all seeds at once). State the number in
   every brief.
+- At most `<max_workers>` workers at once (set it below the runtime's own concurrent-agent limit).
+  When a launch is refused for that limit, leave the item queued and launch it on the next worker
+  return; do not retry.
+- **Caps are not briefable.** The coordinator never grants a worker a cap above `project.md` and
+  never replaces a worker rule in a brief or a message; a brief may only tighten. Changing a cap
+  is a `project.md` edit the user approved.
 - Check real load (process count, CPU) and free disk before launching workers or batches; queue
   when load is high, and stop launching below `<min_free_disk>`.
 - Disk: each task's evidence folder stays under `<evidence_budget>`. At handoff the worker deletes
@@ -267,8 +327,13 @@ The coordinator keeps `<queue_doc>` as the single queue: what runs, who owns it,
 - The coordinator decides and records (queue plus decision log) without asking, EXCEPT protected
   design decisions, releases, and anything the user reserved.
 - **If the user granted autonomy** (project opt-in or a direct statement): never ask questions
-  while a goal runs; resolve open points by research or judgement, record the decision and why,
+  while a goal runs; resolve open points by research or judgement (game-design points through a `designer`, section 3), record the decision and why,
   and judge results yourself.
+- **Questions never block the loop.** While workers run or handoffs wait, write the question in
+  the reply with a recommended answer and keep reviewing and launching everything that does not
+  depend on it. Use a blocking question dialog only when nothing else can move.
+- **A user's answer stands** until the user changes it: never steer workers away from it first and
+  ask afterwards.
 - Workers decide within scope and record material decisions with reasons. Anything touching another
   owner's contract, a protected decision or a locked criterion is a finding.
 - Tooling setup, and restarting a hung tool or server, is done by the studio, not handed to the user.
@@ -310,7 +375,7 @@ The coordinator keeps `<queue_doc>` as the single queue: what runs, who owns it,
 2. Smallest coherent design; record assumptions.
 3. Order: data model and deterministic logic, test harness, integration, UI and feedback, tuning and art.
 4. **UI or graphics change:** capture current state, sketch before implementation, locked
-   discriminating named-region criteria at several resolutions (the before state fails them),
+   discriminating named-region criteria at several resolutions (the before state fails them and a known-good image passes them),
    implement, compare into a new iteration folder, iterate. Never loosen thresholds or mask regions.
    Always review the actual images.
 5. **Art:** promote an exported asset and its import metadata together and import at once; a
@@ -327,8 +392,11 @@ The coordinator keeps `<queue_doc>` as the single queue: what runs, who owns it,
 | Campaign/playthrough bots | progression, combat, balance change | integration/balance worker |
 | Full test-health sweep | ONLY when the user explicitly asks | QA worker |
 | Live-play readability review | after visual/UI milestones | visual polish worker |
+| Design review | new mechanic, progression, economy or endgame design; milestone design critique | designer |
 | Balance tables | any tuning change | balance worker |
-| Generated-asset acceptance | any generated asset before promotion | asset-gen / audio-gen, coordinator promotes |
+| Generated-asset acceptance | any generated asset before promotion | asset-gen / audio-gen run the technical checks; acceptance review below; coordinator promotes |
+| Acceptance review | every art, area or UI item before it is accepted (batched per class) | fresh visual polish worker, never the builder |
+| Milestone player walk | before a milestone, act or scope is called done | integration worker |
 | Audio-design acceptance | audio coverage, mixing and identity milestones | audio-gen + visual polish worker |
 | Boss / skill-animation acceptance | boss retrofit or new skill VFX | feature/balance worker, visual polish worker |
 | Fun-profile playtest | profile or moment-target milestones | visual polish / balance worker |

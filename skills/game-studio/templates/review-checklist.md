@@ -34,6 +34,12 @@ something needs re-running, that is a follow-up brief.
 - [ ] Art: matches the project's style rules; technical pass is not treated as approval; promotion
       checklist items addressed or routed; asset and import metadata promoted together and imported.
 - [ ] Procedural: corpus with invalid-seed and fallback counts and showcase hash stability.
+- [ ] Visual acceptance comes from an independent review (fresh `visual-review` worker, reference
+      side by side at native resolution), not from the builder's verdict or my glance.
+- [ ] Locked criteria have a positive control; nothing is closed with criteria failing or on PARTIAL.
+- [ ] Findings and tuning from a bot or probe show the probe plays as a player would.
+- [ ] Second failed pass on this item: the next brief is a diagnosis (capability, missing asset or
+      tool, bad gate or capture, brief too large), not pass three.
 - [ ] Protected design decisions and project policies intact.
 - [ ] Owning docs updated; no task-report docs created.
 

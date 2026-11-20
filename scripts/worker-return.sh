@@ -7,7 +7,7 @@ case "$input" in *'"agent_id"'*) exit 0 ;; esac
 case "$input" in *'task-notification'*|*'agent-message from='*) ;; *) exit 0 ;; esac
 root="${CLAUDE_PROJECT_DIR:-$PWD}"
 [ -f "$root/.claude/game-studio/project.md" ] || [ -f "$root/.claude/skills/game-studio/project.md" ] || exit 0
-msg="game-studio: a worker reported back. Review its handoff with the checklist (open the key images, grep logs, check scope, caps and coverage) before accepting; delete the accepted item from the queue doc; stop its shells and monitors. Then, unless the studio is paused or the user said to hold launches, check load and disk and fill EVERY free slot within the caps with queue items that do not depend on a running worker, and relaunch any running worker with no new evidence for the stall limit."
+msg="game-studio: a worker reported back. Review its handoff with the checklist (open the key images, grep logs, check scope, caps and coverage) before accepting; visual work also needs its independent visual-review acceptance review, and an item that has failed twice gets a diagnosis brief, not a third pass; delete the accepted item from the queue doc; stop its shells and monitors. Then, unless the studio is paused or the user said to hold launches, check load and disk and fill EVERY free slot within the caps with queue items that do not depend on a running worker, and relaunch any running worker with no new evidence for the stall limit."
 printf '{"hookSpecificOutput":{"hookEventName":"UserPromptSubmit","additionalContext":"%s"}}
 ' "$msg"
 exit 0

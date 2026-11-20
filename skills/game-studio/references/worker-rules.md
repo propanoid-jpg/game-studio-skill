@@ -78,11 +78,22 @@ user's durable rules. The coordinator pastes it into every brief right after the
 rule that would help any game project belongs in this file instead (send it upstream); never fork
 this skill into the project to add rules.
 
+## Evidence you can trust
+
+- A bot, probe or capture can be the thing that is wrong: before reporting a game defect or
+  changing tuning from one, show it plays as a player would and the subject is in frame at the
+  stated distance.
+- Delete only inside your evidence folder, by absolute path, and never recursively through a link
+  or junction into the live tree; write every output to an absolute path (a relative path lands
+  in the wrong root).
+
 ## Autonomy
 
 Make sensible decisions yourself and record each material one with its reason. Anything that changes
 another owner's contract, a locked criterion or a protected design decision is a finding for the
-coordinator, not a decision.
+coordinator, not a decision. So is a game-design call your brief does not make (a mechanic, rule, stat
+or balance target): do not ship your own, and mark any placeholder value as a guess. Only a `designer`
+brief asks for such decisions.
 
 ## Shared tree
 
@@ -120,7 +131,8 @@ Several workers may edit one tree at once.
 
 - Sketch or concept BEFORE implementation, informed by a current capture.
 - Named-region criteria at several resolutions, defined before iterating, locked, and
-  **discriminating**: the before capture must fail them.
+  **discriminating**: the before capture must fail them and a known-good image (the target or an
+  accepted peer) must pass them.
 - Compare with `<compare_tool>` into a new iteration folder each time.
 - Lock on measured noise: every before set includes a natural-variance probe pair (same view, a
   different frame or seed). Set each threshold from that noise, and drop and list a check that

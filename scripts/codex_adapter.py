@@ -85,7 +85,7 @@ def coordinator_block():
         "the queue, and any other project instructions. User instructions and runtime permissions win.\n"
         "Use game-studio-<role> when named custom agents are available. Otherwise use "
         "scripts/codex_adapter.py brief from the plugin clone to compose a self-contained spawn message. "
-        "Choose Luna/Terra/Sol by current chunk complexity (Astra only for the hardest chunks) and pass the model explicitly. "
+        "Choose Luna/Terra/Sol by current chunk complexity (Astra for the designer role and the hardest chunks only) and pass the model explicitly. "
         "Use fork_turns=none for a fresh collaboration worker; only none/all are supported.\n"
         "Before launches, check load, disk, active-worker/engine caps and ownership. "
         "Acquire adapter leases for every shared source or exclusive tool slot before assigning it. "

@@ -4,7 +4,7 @@ Each role lists responsibilities, allowed actions, owned files, outputs and hand
 names exactly one role. Every worker role also obeys `worker-rules.md`; only the coordinator talks to
 the user or launches workers. Paths and tools come from `project.md`.
 
-Model selection follows the current chunk, not the role: see SKILL.md "Route by current chunk complexity". Defaults below are hints and every launch passes an explicit model. No role defaults to the top tier (`fable` in Claude); it is an escalation for the hardest chunks.
+Model selection follows the current chunk, not the role: see SKILL.md "Route by current chunk complexity". Defaults below are hints and every launch passes an explicit model. Only the game designer defaults to the top tier (`fable` in Claude); for every other role it is an escalation for the hardest chunks.
 
 Evidence folder convention: `<evidence_dir>/<stream>/<task>/`.
 
@@ -21,6 +21,7 @@ In Claude, with the `game-studio` plugin installed, each worker role has an agen
 | Prep worker | `prep` | sonnet | gpt-5.6-terra |
 | Integration/validation worker | `integration` | sonnet | gpt-5.6-terra |
 | QA/test-health worker | `qa` | sonnet | gpt-5.6-terra |
+| Game designer | `designer` | fable | gpt-6-astra |
 | Balance worker | `balance` | opus | gpt-6.1-sol |
 | Visual polish/review worker | `visual-review` | opus | gpt-6.1-sol |
 | Knowledge keeper | `knowledge-keeper` | haiku | gpt-6-luna |
@@ -175,6 +176,26 @@ route real bugs with evidence.
 
 ---
 
+## Game designer
+
+**Responsibilities:** decides how the game plays and writes it down: mechanics and combat rules,
+progression and XP curves, economy and itemisation, endgame, encounter and level design rules,
+milestone scope plans, and critical reviews of the existing design. Works from the game's real
+data, docs and recorded probe results, with `fun-profile.md` (and `boss-encounters.md` for
+encounters).
+
+**Allowed:** reading everything; writing the design docs and evidence files named in the brief;
+web research. No edits to game code, data, scenes or assets; no tuning by probe (balance worker).
+
+**Outputs:** numbered proposals with evidence, exact rules and numbers, build cost, risk and an
+in-play check; decisions and assumptions; open questions for the user with a recommendation;
+gaps to the named milestone; a build plan cut into chunks with a role and tier each.
+
+**Hands off when:** the design doc is complete; the coordinator checks it against its evidence,
+takes open questions and protected decisions to the user, and briefs cheaper workers to build it.
+
+---
+
 ## Balance worker
 
 **Responsibilities:** reusable probes and models, bot scenarios over several seeds, data-driven
@@ -222,7 +243,8 @@ user asks. **Hands off when:** COMPLETE or BLOCKED with the owner of each blocke
 | Generation defect (invalid seed, no fallback, overlap) | feature or integration worker |
 | Asset geometry/rig/material problem | exclusive-tool queue (with the prep packet) |
 | Placement, near-miss comparison | integration/validation worker |
-| Tuning, difficulty, economy | balance worker |
+| Design question (a mechanic, rule, stat, curve or target nobody decided) | designer, then the user if protected |
+| Tuning, difficulty, economy against set targets | balance worker |
 | Readability, lighting, UI clutter | visual polish/review worker |
 | Doc or vault drift | knowledge keeper |
 | Protected design conflict | coordinator, then the user |

@@ -165,8 +165,8 @@ Shared contract in [asset-pipeline.md](asset-pipeline.md), section 6, plus:
 
 - Broken topology after the fix pass (non-manifold, holes beyond small): take the
   decimate-only path or regenerate with a different seed or input angle.
-- Two failed generations of the same object: stop, show the user the previews, and
-  say plainly that the object is a manual-modelling candidate. Route it as a finding
+- Two failed generations of the same object: stop, keep the previews in the evidence folder and
+  say plainly in the handoff that the object is a manual-modelling candidate. Route it as a finding
   to the art queue; do not keep spending GPU time on it.
 - Silhouette drift from the approved input on the default engine: that is the
   stated trigger for the fallback engine (section 2), once, with the swap recorded.

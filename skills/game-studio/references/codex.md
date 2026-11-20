@@ -12,7 +12,7 @@ Requires Python 3.11+ and a persistent plugin clone. Run from that clone:
 python scripts/codex_adapter.py install --project /absolute/path/to/game
 ```
 
-This installs 14 standalone role files into the project's .codex/agents/, skill pointers into
+This installs 15 standalone role files into the project's .codex/agents/, skill pointers into
 .agents/skills/, and a managed coordinator block in AGENTS.md. Existing unrelated instructions
 are preserved; unmanaged destination collisions fail before writing. Re-running updates adapter
 files and its block. The installer does not edit global Codex configuration or permissions.
@@ -50,7 +50,7 @@ The message embeds role instructions, canonical worker rules, project settings a
 The adapter prints a request; the coordinator invokes the available spawn tool. It does not create
 agents through a shell or send messages by itself. Only "none" and "all" are supported fork modes
 in this collaboration API. Choose light (gpt-6-luna), medium (gpt-5.6-terra), complex
-(gpt-6.1-sol) or, for the hardest chunks only, hardest (gpt-6-astra) per current chunk. Check the available model list; report unavailable models rather
+(gpt-6.1-sol) or, for game design (the designer role) and the hardest chunks only, hardest (gpt-6-astra) per current chunk. Check the available model list; report unavailable models rather
 than substituting silently. Respect actual runtime concurrency, including the coordinator slot.
 
 Record returned worker IDs and ownership in the queue. Use the available agent messaging, wait,

@@ -33,6 +33,13 @@ caps in `worker-rules.md`. Commands come from `project.md`.
 - Owner: integration or balance worker. Several seeds, bounded time, real game flow (no shortcuts
   the player lacks).
 - A bot pass is an engineering check, never proof of feel, pacing or balance.
+- **Probe validity.** A bot or probe can be the thing that is wrong. Before reporting a game
+  defect or changing tuning from one, show it plays the mechanic the way a player would (inputs,
+  targeting, reach, timing); a capture verdict first shows the subject in frame at the stated
+  distance. A defect that only the bot can reach is a test finding, not a game bug.
+- **Milestone player walk.** Before a milestone is called done: each act on a fresh save, no
+  granted levels, items, flags or debug shortcuts, recording what the game tells the player to do
+  next at every step. A dead end is S0.
 
 ## Layer 4: full test-health sweep
 
@@ -53,6 +60,9 @@ caps in `worker-rules.md`. Commands come from `project.md`.
 - Captures from ordinary gameplay cameras and states at the supported resolutions; review as a
   player: threat telegraphs, friend/foe distinction, text, occlusion, clutter. Findings go to polish
   lists or fixes. Metrics never replace this review.
+- **Acceptance review** (SKILL.md "Quality without the user"): the same role, fresh, judges each
+  art, area or UI item against the project's reference set before it is accepted. The user is
+  not the reviewer.
 
 ## Layer 6: balance tables
 
@@ -61,6 +71,7 @@ caps in `worker-rules.md`. Commands come from `project.md`.
   column comes from recorded data or from evaluating the old table on the current build, **never
   from running an old build**.
 - Output: before/after tables per level and encounter type, plus the data diff.
+- No tuning change from a probe whose play was not validated (Layer 3, probe validity).
 
 ## Layer 7: generated-asset acceptance
 

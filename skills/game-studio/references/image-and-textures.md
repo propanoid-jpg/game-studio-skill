@@ -99,8 +99,9 @@ below.
 ### Concept
 
 1. Draft batch of 4–8 on the draft engine.
-2. View all of them. Show the user the viable ones with their seeds.
-3. Refine only the **one approved draft**: img2img or IP-Adapter refine on the
+2. View all of them against the brief's criteria and the project's reference set; list the
+   viable ones with their seeds in the handoff. The studio picks, not the user.
+3. Refine only the **one chosen draft**: img2img or IP-Adapter refine on the
    refine engine, denoise 0.35–0.55.
 4. Upscale 2× only after approval. Upscaling an unapproved draft is wasted GPU time
    and is not done.

@@ -2,7 +2,8 @@
 # PreToolUse (Bash|PowerShell): warn, never block, when the number of running engine processes
 # has reached the configured cap. Config: engine_process, max_engine_runs (plugin userConfig).
 # Also warns on a wait that wastes tokens: a bare sleep over 270 s (the prompt cache lives 5
-# minutes, so the next call re-bills the whole context) or an idle echo used as a poll.
+# minutes, so the next call re-bills the whole context) or an idle echo used as a poll, and on a
+# recursive delete.
 input=$(cat 2>/dev/null)
 cmd=$(printf '%s' "$input" | tr -d '\n' | sed -n 's/.*"command"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
 secs=$(printf '%s' "$cmd" | sed -n -E 's/^[[:space:]]*(sleep|Start-Sleep( -Seconds| -s)?)[[:space:]]+([0-9]+)[[:space:]]*$/\3/p')
@@ -12,6 +13,17 @@ if [ -n "$secs" ] && [ "$secs" -gt 270 ]; then
   printf '{"systemMessage":"%s","hookSpecificOutput":{"hookEventName":"PreToolUse","additionalContext":"%s"}}\n' "$msg" "$msg"
   exit 0
 fi
+# Recursive deletes have removed checkpoints and followed junctions into the live tree.
+evid="${CLAUDE_PLUGIN_OPTION_EVIDENCE_DIR:-evidence}"
+case "$cmd" in
+  *'git rm '*) ;;
+  *'rm -r'*[\ /]"$evid"/*|*'rm -fr'*[\ /]"$evid"/*|*'Remove-Item'*[\ /]"$evid"/*) ;;
+  *'rm -rf '*|*'rm -fr '*|*'rm -r '*|*'Remove-Item'*'-Recurse'*)
+  msg="game-studio: recursive delete. Delete only inside your own evidence folder, by absolute path; never through a link or junction into the live tree, and never a checkpoint named in a PAUSED block."
+  printf '{"systemMessage":"%s","hookSpecificOutput":{"hookEventName":"PreToolUse","additionalContext":"%s"}}
+' "$msg" "$msg"
+  exit 0 ;;
+esac
 name="${CLAUDE_PLUGIN_OPTION_ENGINE_PROCESS-godot}"
 cap="${CLAUDE_PLUGIN_OPTION_MAX_ENGINE_RUNS:-10}"
 cap="${cap%%.*}"

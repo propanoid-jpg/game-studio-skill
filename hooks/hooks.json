@@ -1,5 +1,5 @@
 {
-  "description": "game-studio safety reminders. Hooks are advisory: they add a warning or reminder and never block, except the delegation check when the enforce_delegation option is set to block.",
+  "description": "game-studio safety reminders. Hooks are advisory: they add a warning or reminder (engine cap, wasteful waits, recursive deletes, queue size, missing model reason, review and refill) and never block, except the delegation check when the enforce_delegation option is set to block.",
   "hooks": {
     "SessionStart": [
       {

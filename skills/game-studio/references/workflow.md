@@ -8,11 +8,13 @@ content, UI, art and tuning at any stage. Paths and tools come from `project.md`
 1. Record the user's direction in `<queue_doc>` with its date. Latest explicit corrections override
    older plans within their scope; move superseded items to history rather than restoring them.
 2. Check the knowledge base (if any) for current state, owners and past decisions.
-3. Break the direction into tasks that own disjoint files. For a large programme write one plan doc
+3. If the direction needs a design decision nobody has made (a mechanic, rule, curve, economy or
+   endgame question), brief a `designer` first and build from its accepted doc.
+4. Break the direction into tasks that own disjoint files. For a large programme write one plan doc
    with numbered decisions and phases; reuse existing plan docs.
-4. Order: data and logic before presentation; prep before exclusive-tool work; that work before its
+5. Order: data and logic before presentation; prep before exclusive-tool work; that work before its
    integration sweep. Pull non-exclusive parts of later phases forward.
-5. Launch as many parallel workers as the caps allow; one owner per exclusive-tool slot.
+6. Launch as many parallel workers as the caps allow; one owner per exclusive-tool slot.
 
 ## 2. Implementation order (every worker)
 
@@ -35,7 +37,11 @@ obsolete compatibility paths in the system you change (not unrelated ones).
    sizes) with a similarity metric for concept comparisons or an exact-pixel metric for stable
    regions. Explain what each region measures and which render differences are expected.
 4. **Prove the criteria discriminate:** the before capture must fail them; self-comparison and
-   stability probes (small exposure change, small shift, a second run) must pass. Coarsen grids
+   stability probes (small exposure change, small shift, a second run) must pass. **Positive
+   control:** the target itself (the concept, the sketch or an accepted peer, shown the way the
+   game will render it) must pass too, and it must be reachable under the project's own render
+   limits (brightness rules, budgets, resolution). A lock that no acceptable result can pass is
+   not a lock. Coarsen grids
    rather than raise thresholds if probes are unstable, and record it. On deterministic captures,
    where a repeat run shows no noise, include a natural-variance probe pair (another frame or
    seed, same view) in every before set and derive each threshold from that measured noise; drop
@@ -45,7 +51,10 @@ obsolete compatibility paths in the system you change (not unrelated ones).
 7. **Iterate the implementation** until checks pass. Never loosen thresholds, move regions or mask
    changed content. If the requirement genuinely changes, version the reference and criteria with a
    written justification. Rebuild a reference after a failure only from before-data and the spec
-   (same regions and formula, written reason), never from after pixels.
+   (same regions and formula, written reason), never from after pixels. **Unreachable
+   criteria:** when a diagnosis shows no acceptable result can pass the lock, the coordinator
+   versions it with the reason in the decision log and it is re-locked with a positive control.
+   An item is never closed with its locked criteria failing.
 8. **Manual review as a player** of the actual images, including ordinary-gameplay views:
    readability, silhouette, lighting, occlusion, text overflow, interaction. Numbers never
    establish quality. Record the review separately.
@@ -63,8 +72,11 @@ obsolete compatibility paths in the system you change (not unrelated ones).
    consumer named in the brief; one quick in-game capture.
 5. **Integration worker:** captures and comparisons at several resolutions, acceptance checks, seed
    sweeps and campaigns for affected content, near-miss fixes.
-6. **Coordinator promotion:** run the project's acceptance checklist; record accepted or
-   needs-iteration with reasons.
+6. **Acceptance review:** a fresh visual polish worker judges the item against the project's
+   reference set and its concept (SKILL.md "Quality without the user"); the builder's verdict
+   does not count and the user is not asked.
+7. **Coordinator promotion:** only after a PASS; run the project's acceptance checklist; record
+   accepted, needs-iteration with the reviewer's defects, or below bar after the pass cap.
 
 **Generation branch** (local pipelines; replaces steps 2–3 for generated batches, then joins
 at step 4): the prep worker's locked criteria gate generated output exactly like sketches —

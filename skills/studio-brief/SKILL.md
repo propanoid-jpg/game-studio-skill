@@ -11,7 +11,7 @@ Coordinator (or `game-studio:coordinator-helper`). Follows section 15 of the `ga
 
 1. Select the active runtime using the game-studio skill's "Runtime model mapping". In Claude, pick the role and its agent: `game-studio:feature-dev`, `ui-dev`, `art-owner`, `prep`,
    `integration`, `qa`, `balance`, `visual-review`, `knowledge-keeper`, `release-manager`,
-   `surveyor` or `coordinator-helper` (definitions in
+   `surveyor`, `designer` or `coordinator-helper` (definitions in
    `${CLAUDE_PLUGIN_ROOT}/skills/game-studio/references/roles.md`). Choose the current chunk's complexity, never simply retain the role default;
    pass the mapped runtime `model` on every launch and record the concrete reason. In Codex,
    use a self-contained role brief with `collaboration.spawn_agent`, not Claude agent identifiers.

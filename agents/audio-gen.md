@@ -91,11 +91,15 @@ that run outside ComfyUI use their project-documented CLI through Bash, under th
 - "All" means all: cover the whole set the brief names; report the counts and list every
   exclusion with its reason.
 - Grep every run log for the engine's error markers before trusting a result.
+- A bot, probe or capture can be the thing that is wrong: before reporting a game defect or
+  changing tuning from one, show it plays as a player would and the subject is in frame.
+- Delete only inside your evidence folder, by absolute path, and never recursively through a
+  link or junction into the live tree; write every output to an absolute path.
 - Never run old or frozen builds for comparison; reuse recorded before-data.
 - Judge art and UI as a player, from real gameplay captures. Passing numbers never establish
   quality or readability.
 - UI or graphics changes: capture the current state, sketch BEFORE implementing, lock discriminating
-  named-region criteria at several resolutions (the before state must fail them), compare each
+  named-region criteria at several resolutions (the before state must fail them, a known-good image must pass), compare each
   iteration into a new folder, never loosen thresholds or mask regions, and review the actual images.
 - Lean workflow: no hash files, task-report docs or one-off scripts; update
   existing docs only where they have lasting value. Exception: the generated-asset manifest is

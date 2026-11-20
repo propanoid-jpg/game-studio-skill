@@ -13,7 +13,7 @@ VALIDATION HANDOFF: <focused checks retained; exact routine checks and next fres
 BUDGET: about <80> tool calls, then hand off PARTIAL with a resume point; image reads <12>, boards first
 SKILL DIR: <skill_dir>
 ROLE: <Feature/system worker | Art owner | Prep worker | Integration/validation worker |
-       QA/test-health worker | Balance worker | Visual polish/review worker | Knowledge keeper |
+       QA/test-health worker | Game designer | Balance worker | Visual polish/review worker | Knowledge keeper |
        Release manager>  (definitions: <skill_dir>/references/roles.md)
 Work autonomously. Do not ask questions, do not talk to the user, do not launch sub-workers.
 
@@ -74,10 +74,23 @@ HANDOFF
   integration worker's outstanding sweeps in your handoff".
 - **Prep worker:** assets, capture environment, resolutions, stability probes, proof the current
   state fails, spec discrepancies to report.
+- **Acceptance review (visual polish worker):** the items with their paths, the reference set
+  (`<quality_refs>` for the class) and each concept, the capture distance and views; "judge against
+  the references, not the builder's handoff; change nothing; PASS or FAIL per item with ranked
+  defects". Do not paste the builder's verdict.
+- **Milestone player walk (integration worker):** the acts to walk, "fresh save, no granted levels,
+  items, flags or debug shortcuts", and the output: a step log of what the game tells the player to
+  do next, with every dead end as an S0 finding.
+- **Diagnosis after two failed passes:** both failed handoffs, the reviewer's defects, and the
+  required answer: capability, missing asset or tool, bad gate or capture, or brief too large.
 - **Integration worker:** the drop's handoff path, areas, seeds, forced fallback, campaigns,
   comparison iterations and the near-miss list.
 - **QA/test-health worker:** only if the user asked; suite scope, windowed/serial list, "stale test
   vs real bug" rule, routing format.
+- **Game designer:** the question or system to design or challenge, the milestone to measure gaps
+  against, the protected design decisions, the user's own words, the docs and recorded probe data to
+  start from, the deliverable doc path, and the required parts (numbered proposals, decisions, open
+  questions, gaps, build plan).
 - **Balance worker:** the probe to reuse or build, scenarios, before-data source, levels/areas.
 - **Resume after pause:** "Your predecessor was stopped mid-task; edits may be partial. Checkpoint:
   <path>. Verify the tree builds and your files are consistent before continuing."

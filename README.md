@@ -120,7 +120,8 @@ Put it in `~/.claude/settings.json` to opt out everywhere, or start one session 
 Codex). Its briefs and reviews set the ceiling for every worker, so the mid tier is a false
 saving; the top tier is wasted on its many routine turns (accept, record, launch). For the rare
 hard management problem (scoping a release, splitting a large goal, a stream that keeps failing
-review) the coordinator briefs a top-tier worker to write the plan and then executes it.
+review) the coordinator briefs a top-tier worker to write the plan and then executes it. Game
+design always goes to the top-tier `designer` worker, whatever the coordinator runs on.
 
 **Sessions.** Use one main session per goal or release. All state lives in files (the queue doc,
 the decision log, `project.md`, handoffs, the coordinator's memory), so a fresh session loses
@@ -139,7 +140,7 @@ start, keep the shared tree parseable, judge like a player, sketch-first visual 
 handoff, never talks to the user and has no Agent tool, so it cannot launch sub-agents. A `model`
 passed at launch overrides the default below.
 
-Role defaults are hints: route each current chunk by complexity. Once complex design is settled, repeated validation moves to a fresh mid-tier chunk; fixed named-test runs may use the cheapest. The top tier (`fable` in Claude) is for the hardest chunks only. See the skill routing policy.
+Role defaults are hints: route each current chunk by complexity. Once complex design is settled, repeated validation moves to a fresh mid-tier chunk; fixed named-test runs may use the cheapest. The top tier (`fable` in Claude) is the `designer` role's default and otherwise for the hardest chunks only. See the skill routing policy.
 
 ### Runtime model mapping
 
@@ -170,6 +171,7 @@ role agents in Codex. Never pass `haiku`, `sonnet` or `opus` as a Codex model.
 | `prep` | Captures, sketches, locked criteria, specs so exclusive tools never wait | sonnet |
 | `integration` | Seed sweeps, fallbacks, campaigns, comparison near-misses | sonnet |
 | `qa` | Test sweeps (only when the user asks), stale and flaky tests | sonnet |
+| `designer` | Game design decisions and docs: mechanics, progression, economy, endgame, design critiques | fable |
 | `balance` | Probes, tuning, before/after tables | opus |
 | `visual-review` | Live-play readability review and presentation polish | opus |
 | `knowledge-keeper` | Vault setup, sync, compile and lint | haiku |
@@ -193,15 +195,18 @@ Hooks are advisory and never block, except the delegation check when `enforce_de
   `block` it denies the call instead.
 - **PreToolUse (Bash, PowerShell):** counts running processes whose name contains `engine_process`
   (`tasklist` on Windows, `pgrep` on macOS/Linux) and warns when the count reaches
-  `max_engine_runs`. An empty process name or a cap of 0 turns it off.
+  `max_engine_runs`. An empty process name or a cap of 0 turns it off. Also warns on a wasteful
+  wait (a bare sleep over 270 s) and on a recursive delete outside the evidence folder.
 - **PostToolUse (Agent):** after the coordinator launches a `game-studio:*` or general-purpose
-  worker, reminds it to fill the remaining free slots with independent queue items.
+  worker, reminds it to tag the queue line and fill the remaining free slots with independent queue
+  items, and flags a role agent launched above its default model with no CHUNK MODEL reason.
 - **UserPromptSubmit:** when a background worker reports back to the main session, reminds the
   coordinator to review the handoff with the checklist, clean up, refill every free slot and
   relaunch stalled workers. Silent on typed prompts and outside studio projects. (A SubagentStop
   hook is deliberately not used: its context goes to the finishing worker.)
 - **SessionStart:** if the project has `.claude/game-studio/project.md` (or
-  `.claude/skills/game-studio/project.md`) or the queue doc, adds a one-line reminder to read them.
+  `.claude/skills/game-studio/project.md`) or the queue doc, adds a one-line reminder to read them,
+  and warns when the queue doc passes 30 KB or the instruction file passes 10 KB.
   Silent in other projects.
 
 ### Options
@@ -250,6 +255,28 @@ ownership, writes one brief per task with `/game-studio:studio-brief`, launches 
 before recording acceptance and launching the next task.
 
 ## Changelog
+
+- **1.8.0** (game design on the top tier, from the Alpha 0.6 sessions)
+  - New `designer` role, default `fable` (`gpt-6-astra` in Codex): mechanics, combat rules,
+    progression, economy, endgame, encounter rules, scope plans and design critiques. Its
+    deliverable has fixed parts: numbered proposals with evidence and cost, decisions, open
+    questions for the user, gaps to the milestone and a build plan.
+  - Design decisions belong to the designer or the user: the coordinator no longer rules on
+    them inline, and implementers report a missing design call instead of shipping a guess.
+  - Codex adapter installs 15 worker roles.
+  - Quality without the user: the user no longer reviews boards. Visual work is accepted by an
+    independent `visual-review` acceptance review against the project's reference set
+    (`project.md` "Quality bar"), and a milestone is done only after a fresh-save player walk.
+  - Locked criteria need a positive control (a known-good image must pass) and are versioned,
+    never closed failing. Two failed passes on one item force a diagnosis before a third; a
+    failure after that parks the item on a "Below bar" list instead of looping.
+  - Probe validity: no bug report or tuning change from a bot that does not play like a player.
+  - Queue doc stays a queue: launches tag the item's line, and session start warns when the doc
+    passes 30 KB. After a compaction every launch is checked against finished and live work.
+  - `<max_workers>` in `project.md`; caps and worker rules cannot be loosened in a brief;
+    questions no longer block the loop.
+  - Hooks: reminder when a launch above the role default has no CHUNK MODEL reason, and a
+    warning on recursive deletes.
 
 - **1.7.0** (token efficiency, from an analysis of 2,046 worker runs)
   - Workers no longer preload the skill and lose the Skill and Monitor tools: a smaller prompt on
